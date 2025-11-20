@@ -1,20 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bus_connect/presentation/providers/auth_provider.dart';
-import '../../data/providers/parcel_api_provider.dart';
 import '../../data/repositories/parcel_repository.dart';
 import '../../data/models/parcel_model/parcel_model.dart';
+import 'package:bus_connect/app.dart';
 
-/// ==================== API PROVIDER ====================
-final parcelApiProvider = Provider<ParcelApiProvider>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return ParcelApiProvider(apiClient.dio);
-});
-
-/// ==================== REPOSITORY PROVIDER ====================
-final parcelRepositoryProvider = Provider<ParcelRepository>((ref) {
-  final apiProvider = ref.watch(parcelApiProvider);
-  return ParcelRepository(apiProvider);
-});
 
 /// ==================== STATE ====================
 class ParcelState {

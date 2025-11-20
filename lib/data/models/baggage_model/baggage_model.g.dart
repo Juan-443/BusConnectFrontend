@@ -13,6 +13,9 @@ _$BaggageModelImpl _$$BaggageModelImplFromJson(Map<String, dynamic> json) =>
       fee: (json['fee'] as num).toDouble(),
       tagCode: json['tagCode'] as String,
       ticketId: (json['ticketId'] as num).toInt(),
+      passengerName: json['passengerName'] as String?,
+      tripInfo: json['tripInfo'] as String?,
+      excessWeight: json['excessWeight'] as bool?,
     );
 
 Map<String, dynamic> _$$BaggageModelImplToJson(_$BaggageModelImpl instance) =>
@@ -22,6 +25,9 @@ Map<String, dynamic> _$$BaggageModelImplToJson(_$BaggageModelImpl instance) =>
       'fee': instance.fee,
       'tagCode': instance.tagCode,
       'ticketId': instance.ticketId,
+      'passengerName': instance.passengerName,
+      'tripInfo': instance.tripInfo,
+      'excessWeight': instance.excessWeight,
     };
 
 _$BaggageCreateRequestImpl _$$BaggageCreateRequestImplFromJson(

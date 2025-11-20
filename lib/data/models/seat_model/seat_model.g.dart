@@ -12,6 +12,8 @@ _$SeatModelImpl _$$SeatModelImplFromJson(Map<String, dynamic> json) =>
       number: json['number'] as String,
       type: $enumDecode(_$SeatTypeEnumMap, json['type']),
       busId: (json['busId'] as num).toInt(),
+      busPlate: json['busPlate'] as String?,
+      busCapacity: (json['busCapacity'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$SeatModelImplToJson(_$SeatModelImpl instance) =>
@@ -20,6 +22,8 @@ Map<String, dynamic> _$$SeatModelImplToJson(_$SeatModelImpl instance) =>
       'number': instance.number,
       'type': _$SeatTypeEnumMap[instance.type]!,
       'busId': instance.busId,
+      'busPlate': instance.busPlate,
+      'busCapacity': instance.busCapacity,
     };
 
 const _$SeatTypeEnumMap = {

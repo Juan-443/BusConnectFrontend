@@ -9,8 +9,6 @@ part 'assignment_api_provider.g.dart';
 abstract class AssignmentApiProvider {
   factory AssignmentApiProvider(Dio dio, {String baseUrl}) = _AssignmentApiProvider;
 
-  // ==================== ASSIGNMENT CRUD ====================
-
   @POST(ApiConstants.assignmentCreate)
   Future<AssignmentResponse> createAssignment(@Body() AssignmentCreateRequest request);
 
@@ -23,8 +21,6 @@ abstract class AssignmentApiProvider {
   @DELETE('${ApiConstants.assignmentDelete}/{id}')
   Future<void> deleteAssignment(@Path('id') int id);
 
-  // ==================== ASSIGNMENT QUERIES ====================
-
   @GET(ApiConstants.assignmentAll)
   Future<List<AssignmentResponse>> getAllAssignments();
 
@@ -35,7 +31,7 @@ abstract class AssignmentApiProvider {
   Future<AssignmentResponse> getAssignmentByTrip(@Path('tripId') int tripId);
 
   @GET('${ApiConstants.assignmentWithDetails}/{tripId}/details')
-  Future<AssignmentModel> getAssignmentWithDetails(@Path('tripId') int tripId);
+  Future<AssignmentResponse> getAssignmentWithDetails(@Path('tripId') int tripId);
 
   @GET('${ApiConstants.assignmentsByDriver}/{driverId}')
   Future<List<AssignmentResponse>> getAssignmentsByDriver(@Path('driverId') int driverId);
@@ -46,7 +42,7 @@ abstract class AssignmentApiProvider {
       );
 
   @GET('${ApiConstants.assignmentsByDriverAndDate}/{driverId}/date')
-  Future<List<AssignmentModel>> getAssignmentsByDriverAndDate(
+  Future<List<AssignmentResponse>> getAssignmentsByDriverAndDate(
       @Path('driverId') int driverId,
       @Query('date') String date,
       );
@@ -62,12 +58,8 @@ abstract class AssignmentApiProvider {
       @Query('end') String end,
       );
 
-  // ==================== ASSIGNMENT ACTIONS ====================
-
   @POST('${ApiConstants.assignmentApproveChecklist}/{id}/approve-checklist')
   Future<AssignmentResponse> approveChecklist(@Path('id') int id);
-
-  // ==================== ASSIGNMENT VALIDATION ====================
 
   @GET('${ApiConstants.assignmentHasActive}/{tripId}/has-assignment')
   Future<bool> hasActiveAssignment(@Path('tripId') int tripId);

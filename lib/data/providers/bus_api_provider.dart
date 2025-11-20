@@ -51,7 +51,7 @@ abstract class BusApiProvider {
   @PATCH('${ApiConstants.busChangeStatus}/{id}/status')
   Future<BusResponse> changeBusStatus(
       @Path('id') int id,
-      @Query('status') BusStatus status,
+      @Query('status') String status,
       );
 
   // ==================== BUS VALIDATION ====================

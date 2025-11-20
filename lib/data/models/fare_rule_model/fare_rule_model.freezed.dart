@@ -30,6 +30,8 @@ mixin _$FareRuleModel {
   int get routeId => throw _privateConstructorUsedError;
   int get fromStopId => throw _privateConstructorUsedError;
   int get toStopId => throw _privateConstructorUsedError;
+  String? get fromStopName => throw _privateConstructorUsedError;
+  String? get toStopName => throw _privateConstructorUsedError;
 
   /// Serializes this FareRuleModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -57,6 +59,8 @@ abstract class $FareRuleModelCopyWith<$Res> {
     int routeId,
     int fromStopId,
     int toStopId,
+    String? fromStopName,
+    String? toStopName,
   });
 }
 
@@ -83,6 +87,8 @@ class _$FareRuleModelCopyWithImpl<$Res, $Val extends FareRuleModel>
     Object? routeId = null,
     Object? fromStopId = null,
     Object? toStopId = null,
+    Object? fromStopName = freezed,
+    Object? toStopName = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -118,6 +124,14 @@ class _$FareRuleModelCopyWithImpl<$Res, $Val extends FareRuleModel>
                 ? _value.toStopId
                 : toStopId // ignore: cast_nullable_to_non_nullable
                       as int,
+            fromStopName: freezed == fromStopName
+                ? _value.fromStopName
+                : fromStopName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            toStopName: freezed == toStopName
+                ? _value.toStopName
+                : toStopName // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -142,6 +156,8 @@ abstract class _$$FareRuleModelImplCopyWith<$Res>
     int routeId,
     int fromStopId,
     int toStopId,
+    String? fromStopName,
+    String? toStopName,
   });
 }
 
@@ -167,6 +183,8 @@ class __$$FareRuleModelImplCopyWithImpl<$Res>
     Object? routeId = null,
     Object? fromStopId = null,
     Object? toStopId = null,
+    Object? fromStopName = freezed,
+    Object? toStopName = freezed,
   }) {
     return _then(
       _$FareRuleModelImpl(
@@ -202,6 +220,14 @@ class __$$FareRuleModelImplCopyWithImpl<$Res>
             ? _value.toStopId
             : toStopId // ignore: cast_nullable_to_non_nullable
                   as int,
+        fromStopName: freezed == fromStopName
+            ? _value.fromStopName
+            : fromStopName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        toStopName: freezed == toStopName
+            ? _value.toStopName
+            : toStopName // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -219,6 +245,8 @@ class _$FareRuleModelImpl implements _FareRuleModel {
     required this.routeId,
     required this.fromStopId,
     required this.toStopId,
+    this.fromStopName,
+    this.toStopName,
   }) : _discounts = discounts,
        _passengerDiscounts = passengerDiscounts;
 
@@ -258,10 +286,14 @@ class _$FareRuleModelImpl implements _FareRuleModel {
   final int fromStopId;
   @override
   final int toStopId;
+  @override
+  final String? fromStopName;
+  @override
+  final String? toStopName;
 
   @override
   String toString() {
-    return 'FareRuleModel(id: $id, basePrice: $basePrice, discounts: $discounts, dynamicPricing: $dynamicPricing, passengerDiscounts: $passengerDiscounts, routeId: $routeId, fromStopId: $fromStopId, toStopId: $toStopId)';
+    return 'FareRuleModel(id: $id, basePrice: $basePrice, discounts: $discounts, dynamicPricing: $dynamicPricing, passengerDiscounts: $passengerDiscounts, routeId: $routeId, fromStopId: $fromStopId, toStopId: $toStopId, fromStopName: $fromStopName, toStopName: $toStopName)';
   }
 
   @override
@@ -286,7 +318,11 @@ class _$FareRuleModelImpl implements _FareRuleModel {
             (identical(other.fromStopId, fromStopId) ||
                 other.fromStopId == fromStopId) &&
             (identical(other.toStopId, toStopId) ||
-                other.toStopId == toStopId));
+                other.toStopId == toStopId) &&
+            (identical(other.fromStopName, fromStopName) ||
+                other.fromStopName == fromStopName) &&
+            (identical(other.toStopName, toStopName) ||
+                other.toStopName == toStopName));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -301,6 +337,8 @@ class _$FareRuleModelImpl implements _FareRuleModel {
     routeId,
     fromStopId,
     toStopId,
+    fromStopName,
+    toStopName,
   );
 
   /// Create a copy of FareRuleModel
@@ -327,6 +365,8 @@ abstract class _FareRuleModel implements FareRuleModel {
     required final int routeId,
     required final int fromStopId,
     required final int toStopId,
+    final String? fromStopName,
+    final String? toStopName,
   }) = _$FareRuleModelImpl;
 
   factory _FareRuleModel.fromJson(Map<String, dynamic> json) =
@@ -348,6 +388,10 @@ abstract class _FareRuleModel implements FareRuleModel {
   int get fromStopId;
   @override
   int get toStopId;
+  @override
+  String? get fromStopName;
+  @override
+  String? get toStopName;
 
   /// Create a copy of FareRuleModel
   /// with the given fields replaced by the non-null parameter values.

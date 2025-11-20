@@ -1,21 +1,9 @@
-import 'package:bus_connect/presentation/providers/auth_provider.dart';
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/trip_api_provider.dart';
 import '../../data/repositories/trip_repository.dart';
 import '../../data/models/trip_model/trip_model.dart';
 import '../../core/constants/enums/trip_status.dart';
-
-/// ==================== API PROVIDER ====================
-final tripApiProvider = Provider<TripApiProvider>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return TripApiProvider(apiClient.dio);
-});
-
-/// ==================== REPOSITORY PROVIDER ====================
-final tripRepositoryProvider = Provider<TripRepository>((ref) {
-  final apiProvider = ref.watch(tripApiProvider);
-  return TripRepository(apiProvider);
-});
+import 'package:bus_connect/app.dart';
 
 /// ==================== STATE ====================
 class TripSearchState {
@@ -23,12 +11,14 @@ class TripSearchState {
   final TripResponse? selectedTrip;
   final bool isLoading;
   final String? error;
+  final TripStatus? filterStatus;
 
   const TripSearchState({
     this.trips = const [],
     this.selectedTrip,
     this.isLoading = false,
     this.error,
+    this.filterStatus,
   });
 
   TripSearchState copyWith({
@@ -36,11 +26,14 @@ class TripSearchState {
     TripResponse? selectedTrip,
     bool? isLoading,
     String? error,
+    TripStatus? filterStatus,
   }) {
     return TripSearchState(
       trips: trips ?? this.trips,
+      selectedTrip: selectedTrip ?? this.selectedTrip,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      filterStatus: filterStatus ?? this.filterStatus,
     );
   }
 
@@ -51,8 +44,36 @@ class TripSearchState {
 /// ==================== NOTIFIER ====================
 class TripSearchNotifier extends StateNotifier<TripSearchState> {
   final TripRepository _repository;
+  Timer? _autoUpdateTimer;
 
   TripSearchNotifier(this._repository) : super(const TripSearchState());
+
+  Future<void> loadAllTrips() async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final result = await _repository.searchTrips();
+
+    result.fold(
+          (failure) => state = state.copyWith(
+        isLoading: false,
+        error: failure.message,
+      ),
+          (trips) => state = state.copyWith(
+        trips: trips,
+        isLoading: false,
+        error: null,
+      ),
+    );
+  }
+
+  Future<void> fetchTripsByDate(String date) async {
+    state = state.copyWith(isLoading: true, error: null);
+    final result = await _repository.searchTrips(date: date);
+    result.fold(
+          (failure) => state = state.copyWith(isLoading: false, error: failure.message),
+          (trips) => state = state.copyWith(isLoading: false, trips: trips),
+    );
+  }
 
   Future<void> searchTrips({
     int? routeId,
@@ -79,6 +100,12 @@ class TripSearchNotifier extends StateNotifier<TripSearchState> {
       ),
     );
   }
+
+  void filterByStatus(TripStatus? status) {
+    state = state.copyWith(filterStatus: status);
+    searchTrips(status: status);
+  }
+
   void selectTrip(TripResponse trip) {
     state = state.copyWith(selectedTrip: trip);
   }
@@ -93,11 +120,18 @@ class TripSearchNotifier extends StateNotifier<TripSearchState> {
         state = state.copyWith(isLoading: false, error: failure.message);
         return false;
       },
-          (trip) {
+          (trip) async {
+        final detailResult = await _repository.getTripWithDetails(trip.id);
+
+        final tripWithDetails = detailResult.fold(
+              (failure) => trip,
+              (detailedTrip) => detailedTrip,
+        );
+
         state = state.copyWith(
           isLoading: false,
-          trips: [...state.trips, trip],
-          selectedTrip: trip,
+          trips: [...state.trips, tripWithDetails],
+          selectedTrip: tripWithDetails,
         );
         return true;
       },
@@ -115,7 +149,8 @@ class TripSearchNotifier extends StateNotifier<TripSearchState> {
         return false;
       },
           (trip) {
-        final updatedTrips = state.trips.map((t) => t.id == id ? trip : t).toList();
+        final updatedTrips =
+        state.trips.map((t) => t.id == id ? trip : t).toList();
         state = state.copyWith(
           isLoading: false,
           trips: updatedTrips,
@@ -124,6 +159,36 @@ class TripSearchNotifier extends StateNotifier<TripSearchState> {
         return true;
       },
     );
+  }
+
+  Future<bool> deleteTrip(int id) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final result = await _repository.deleteTrip(id);
+
+    return result.fold(
+          (failure) {
+        state = state.copyWith(isLoading: false, error: failure.message);
+        return false;
+      },
+          (_) {
+        final updatedTrips = state.trips.where((t) => t.id != id).toList();
+        state = state.copyWith(
+          isLoading: false,
+          trips: updatedTrips,
+        );
+        return true;
+      },
+    );
+  }
+
+  Future<bool> cancelTrip(int id) async {
+    return changeTripStatus(id, TripStatus.CANCELLED);
+  }
+
+  Future<bool> changeTripStatus(int id, TripStatus status) async {
+    final request = TripUpdateRequest(status: status);
+    return updateTrip(id, request);
   }
 
   Future<void> getTodayTrips() async {
@@ -151,18 +216,42 @@ class TripSearchNotifier extends StateNotifier<TripSearchState> {
   void clearError() {
     state = state.copyWith(error: null);
   }
+  void startAutoUpdateTimer() {
+    _autoUpdateTimer?.cancel();
+    _autoUpdateTimer = Timer.periodic(
+      const Duration(minutes: 2),
+          (_) => _refreshTripsFromBackend(),
+    );
+    _refreshTripsFromBackend();
+  }
+
+  Future<void> _refreshTripsFromBackend() async {
+    if (!state.isLoading) {
+      await loadAllTrips();
+    }
+  }
+
+  /// Detiene el timer de auto-actualización
+  void stopAutoUpdateTimer() {
+    _autoUpdateTimer?.cancel();
+    _autoUpdateTimer = null;
+  }
+
+  @override
+  void dispose() {
+    stopAutoUpdateTimer();
+    super.dispose();
+  }
 }
 
 /// ==================== PROVIDERS ====================
 
-/// Proveedor principal del buscador de viajes
 final tripSearchProvider =
 StateNotifierProvider<TripSearchNotifier, TripSearchState>((ref) {
   final repository = ref.watch(tripRepositoryProvider);
   return TripSearchNotifier(repository);
 });
 
-/// Proveedor para obtener detalles de un viaje específico
 final tripDetailProvider =
 FutureProvider.family<TripResponse, int>((ref, id) async {
   final repository = ref.watch(tripRepositoryProvider);

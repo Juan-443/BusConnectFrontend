@@ -444,7 +444,8 @@ class __$$BusCreateRequestImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@JsonSerializable(explicitToJson: true)
 class _$BusCreateRequestImpl implements _BusCreateRequest {
   const _$BusCreateRequestImpl({
     required this.plate,
@@ -688,7 +689,8 @@ class __$$BusUpdateRequestImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@JsonSerializable(explicitToJson: true)
 class _$BusUpdateRequestImpl implements _BusUpdateRequest {
   const _$BusUpdateRequestImpl({
     this.plate,

@@ -1,42 +1,39 @@
-import 'package:bus_connect/presentation/providers/auth_provider.dart';
+import 'package:bus_connect/core/constants/enums/ticket_status.dart'; // ✅ AGREGAR IMPORT
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/ticket_api_provider.dart';
 import '../../data/repositories/ticket_repository.dart';
 import '../../data/models/ticket_model/ticket_model.dart';
+import 'package:bus_connect/app.dart';
 
-/// ==================== API PROVIDER ====================
-final ticketApiProvider = Provider<TicketApiProvider>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return TicketApiProvider(apiClient.dio);
-});
-
-/// ==================== REPOSITORY PROVIDER ====================
-final ticketRepositoryProvider = Provider<TicketRepository>((ref) {
-  final apiProvider = ref.watch(ticketApiProvider);
-  return TicketRepository(apiProvider);
-});
 
 /// ==================== STATE ====================
 class TicketState {
   final List<TicketResponse> tickets;
+  final TicketResponse? selectedTicket;
   final bool isLoading;
   final String? error;
+  final TicketStatus? filterStatus;
 
   const TicketState({
     this.tickets = const [],
+    this.selectedTicket,
     this.isLoading = false,
     this.error,
+    this.filterStatus,
   });
 
   TicketState copyWith({
     List<TicketResponse>? tickets,
+    TicketResponse? selectedTicket,
     bool? isLoading,
     String? error,
+    TicketStatus? filterStatus,
   }) {
     return TicketState(
       tickets: tickets ?? this.tickets,
+      selectedTicket: selectedTicket ?? this.selectedTicket,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      filterStatus: filterStatus ?? this.filterStatus,
     );
   }
 
@@ -50,6 +47,24 @@ class TicketNotifier extends StateNotifier<TicketState> {
 
   TicketNotifier(this._repository) : super(const TicketState());
 
+  Future<void> loadAllTickets() async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final result = await _repository.getAllTickets();
+
+    result.fold(
+          (failure) => state = state.copyWith(
+        isLoading: false,
+        error: failure.message,
+      ),
+          (tickets) => state = state.copyWith(
+        tickets: tickets,
+        isLoading: false,
+        error: null,
+      ),
+    );
+  }
+
   Future<void> loadMyTickets() async {
     state = state.copyWith(isLoading: true, error: null);
 
@@ -62,6 +77,42 @@ class TicketNotifier extends StateNotifier<TicketState> {
       ),
           (tickets) => state = state.copyWith(
         tickets: tickets,
+        isLoading: false,
+        error: null,
+      ),
+    );
+  }
+
+  Future<void> loadTicketsByTrip(int tripId) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final result = await _repository.getTicketsByTrip(tripId);
+
+    result.fold(
+          (failure) => state = state.copyWith(
+        isLoading: false,
+        error: failure.message,
+      ),
+          (tickets) => state = state.copyWith(
+        tickets: tickets,
+        isLoading: false,
+        error: null,
+      ),
+    );
+  }
+
+  Future<void> loadTicketById(int id) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final result = await _repository.getTicketWithDetails(id);
+
+    result.fold(
+          (failure) => state = state.copyWith(
+        isLoading: false,
+        error: failure.message,
+      ),
+          (ticket) => state = state.copyWith(
+        selectedTicket: ticket,
         isLoading: false,
         error: null,
       ),
@@ -82,6 +133,32 @@ class TicketNotifier extends StateNotifier<TicketState> {
         final updatedTickets = [...state.tickets, ticket];
         state = state.copyWith(
           tickets: updatedTickets,
+          isLoading: false,
+          error: null,
+        );
+        return true;
+      },
+    );
+  }
+
+  Future<bool> updateTicket(int id, TicketUpdateRequest request) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final result = await _repository.updateTicket(id, request);
+
+    return result.fold(
+          (failure) {
+        state = state.copyWith(isLoading: false, error: failure.message);
+        return false;
+      },
+          (updatedTicket) {
+        final updatedTickets = state.tickets.map((t) {
+          return t.id == id ? updatedTicket : t;
+        }).toList();
+
+        state = state.copyWith(
+          tickets: updatedTickets,
+          selectedTicket: updatedTicket,
           isLoading: false,
           error: null,
         );
@@ -115,6 +192,32 @@ class TicketNotifier extends StateNotifier<TicketState> {
     );
   }
 
+  Future<bool> deleteTicket(int id) async {
+    state = state.copyWith(isLoading: true, error: null);
+
+    final result = await _repository.deleteTicket(id);
+
+    return result.fold(
+          (failure) {
+        state = state.copyWith(isLoading: false, error: failure.message);
+        return false;
+      },
+          (_) {
+        final updatedTickets = state.tickets.where((t) => t.id != id).toList();
+        state = state.copyWith(
+          tickets: updatedTickets,
+          isLoading: false,
+          error: null,
+        );
+        return true;
+      },
+    );
+  }
+
+  void filterByStatus(TicketStatus? status) {
+    state = state.copyWith(filterStatus: status);
+  }
+
   void clearError() {
     state = state.copyWith(error: null);
   }
@@ -122,18 +225,20 @@ class TicketNotifier extends StateNotifier<TicketState> {
   void clearState() {
     state = const TicketState();
   }
+
+  void clearSelectedTicket() {
+    state = state.copyWith(selectedTicket: null);
+  }
 }
 
 /// ==================== PROVIDERS ====================
 
-/// Proveedor principal para gestionar todos los tickets
 final ticketProvider =
 StateNotifierProvider<TicketNotifier, TicketState>((ref) {
   final repository = ref.watch(ticketRepositoryProvider);
   return TicketNotifier(repository);
 });
 
-/// Proveedor para obtener un ticket con sus detalles (FutureProvider)
 final ticketDetailProvider =
 FutureProvider.family<TicketResponse, int>((ref, id) async {
   final repository = ref.watch(ticketRepositoryProvider);

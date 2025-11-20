@@ -1,18 +1,8 @@
-import 'package:bus_connect/data/providers/bus_api_provider.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/bus_model/bus_model.dart';
 import '../../data/repositories/bus_repository.dart';
 import '../../core/constants/enums/bus_status.dart';
-
-/// ==================== BUS REPOSITORY PROVIDER ====================
-
-final busRepositoryProvider = Provider<BusRepository>((ref) {
-  final dio = Dio();
-  final apiProvider = BusApiProvider(dio);
-  return BusRepository(apiProvider);
-});
-
+import 'package:bus_connect/app.dart';
 /// ==================== STATE ====================
 
 class BusState {
@@ -36,19 +26,21 @@ class BusState {
     bool? isLoading,
     String? error,
     BusStatus? filterStatus,
+    bool clearFilter = false,
+    bool clearSelectedBus = false,
   }) {
     return BusState(
       buses: buses ?? this.buses,
       selectedBus: selectedBus ?? this.selectedBus,
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      filterStatus: filterStatus ?? this.filterStatus,
+      filterStatus: clearFilter ? null : (filterStatus ?? this.filterStatus),
     );
   }
 
   List<BusResponse> get filteredBuses {
     if (filterStatus == null) return buses;
-    return buses.where((b) => b.status.name == filterStatus!.name).toList();
+    return buses.where((b) => b.status == filterStatus).toList();
   }
 
   List<BusResponse> get availableBuses {
@@ -69,7 +61,8 @@ class BusNotifier extends StateNotifier<BusState> {
 
     final result = await _repository.getAllBuses();
     result.fold(
-          (failure) => state = state.copyWith(isLoading: false, error: failure.message),
+          (failure) =>
+      state = state.copyWith(isLoading: false, error: failure.message),
           (buses) => state = state.copyWith(buses: buses, isLoading: false),
     );
   }
@@ -79,7 +72,8 @@ class BusNotifier extends StateNotifier<BusState> {
     state = state.copyWith(isLoading: true);
     final result = await _repository.getBusById(id);
     result.fold(
-          (failure) => state = state.copyWith(isLoading: false, error: failure.message),
+          (failure) =>
+      state = state.copyWith(isLoading: false, error: failure.message),
           (bus) => state = state.copyWith(selectedBus: bus, isLoading: false),
     );
   }
@@ -89,7 +83,8 @@ class BusNotifier extends StateNotifier<BusState> {
     state = state.copyWith(isLoading: true);
     final result = await _repository.getBusWithSeats(id);
     result.fold(
-          (failure) => state = state.copyWith(isLoading: false, error: failure.message),
+          (failure) =>
+      state = state.copyWith(isLoading: false, error: failure.message),
           (bus) => state = state.copyWith(selectedBus: bus, isLoading: false),
     );
   }
@@ -99,7 +94,8 @@ class BusNotifier extends StateNotifier<BusState> {
     state = state.copyWith(isLoading: true);
     final result = await _repository.getBusByPlate(plate);
     result.fold(
-          (failure) => state = state.copyWith(isLoading: false, error: failure.message),
+          (failure) =>
+      state = state.copyWith(isLoading: false, error: failure.message),
           (bus) => state = state.copyWith(selectedBus: bus, isLoading: false),
     );
   }
@@ -109,7 +105,8 @@ class BusNotifier extends StateNotifier<BusState> {
     state = state.copyWith(isLoading: true);
     final result = await _repository.getBusesByStatus(status);
     result.fold(
-          (failure) => state = state.copyWith(isLoading: false, error: failure.message),
+          (failure) =>
+      state = state.copyWith(isLoading: false, error: failure.message),
           (buses) => state = state.copyWith(buses: buses, isLoading: false),
     );
   }
@@ -119,7 +116,8 @@ class BusNotifier extends StateNotifier<BusState> {
     state = state.copyWith(isLoading: true);
     final result = await _repository.getAvailableBuses(minCapacity);
     result.fold(
-          (failure) => state = state.copyWith(isLoading: false, error: failure.message),
+          (failure) =>
+      state = state.copyWith(isLoading: false, error: failure.message),
           (buses) => state = state.copyWith(buses: buses, isLoading: false),
     );
   }
@@ -154,7 +152,8 @@ class BusNotifier extends StateNotifier<BusState> {
       },
           (bus) {
         final updated = state.buses.map((b) => b.id == id ? bus : b).toList();
-        state = state.copyWith(isLoading: false, buses: updated, selectedBus: bus);
+        state =
+            state.copyWith(isLoading: false, buses: updated, selectedBus: bus);
         return true;
       },
     );
@@ -188,7 +187,8 @@ class BusNotifier extends StateNotifier<BusState> {
       },
           (bus) {
         final updated = state.buses.map((b) => b.id == id ? bus : b).toList();
-        state = state.copyWith(isLoading: false, buses: updated, selectedBus: bus);
+        state =
+            state.copyWith(isLoading: false, buses: updated, selectedBus: bus);
         return true;
       },
     );
@@ -202,21 +202,25 @@ class BusNotifier extends StateNotifier<BusState> {
 
   /// --- Filters
   void setStatusFilter(BusStatus? status) {
-    state = state.copyWith(filterStatus: status);
+    if (status == null) {
+      state = state.copyWith(clearFilter: true);
+    } else {
+      state = state.copyWith(filterStatus: status);
+    }
   }
 
   void clearFilter() {
-    state = state.copyWith(filterStatus: null);
+    state = state.copyWith(clearFilter: true);
   }
 
   void clearSelectedBus() {
-    state = state.copyWith(selectedBus: null);
+    state = state.copyWith(clearSelectedBus: true);
   }
 }
+  /// ==================== PROVIDER ====================
 
-/// ==================== PROVIDER ====================
+  final busProvider = StateNotifierProvider<BusNotifier, BusState>((ref) {
+    final repository = ref.watch(busRepositoryProvider);
+    return BusNotifier(repository);
+  });
 
-final busProvider = StateNotifierProvider<BusNotifier, BusState>((ref) {
-  final repository = ref.watch(busRepositoryProvider);
-  return BusNotifier(repository);
-});

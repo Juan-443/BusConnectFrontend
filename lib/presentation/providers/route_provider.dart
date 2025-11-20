@@ -1,21 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:bus_connect/presentation/providers/auth_provider.dart';
 import '../../data/models/route_model/route_model.dart';
 import '../../data/models/stop_model/stop_model.dart';
-import '../../data/providers/route_api_provider.dart';
 import '../../data/repositories/route_repository.dart';
-
-/// ==================== API PROVIDER ====================
-final routeApiProvider = Provider<RouteApiProvider>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return RouteApiProvider(apiClient.dio);
-});
-
-/// ==================== REPOSITORY PROVIDER ====================
-final routeRepositoryProvider = Provider<RouteRepository>((ref) {
-  final apiProvider = ref.watch(routeApiProvider);
-  return RouteRepository(apiProvider);
-});
+import 'package:bus_connect/app.dart';
 
 /// ==================== STATE ====================
 class RouteState {

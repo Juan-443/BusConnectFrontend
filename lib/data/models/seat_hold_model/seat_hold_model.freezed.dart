@@ -22,12 +22,16 @@ SeatHoldModel _$SeatHoldModelFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$SeatHoldModel {
   int get id => throw _privateConstructorUsedError;
-  String get expiresAt => throw _privateConstructorUsedError;
   String get seatNumber => throw _privateConstructorUsedError;
+  String get expiresAt => throw _privateConstructorUsedError;
   HoldStatus get status => throw _privateConstructorUsedError;
   String get createdAt => throw _privateConstructorUsedError;
   int get tripId => throw _privateConstructorUsedError;
   int get userId => throw _privateConstructorUsedError;
+  String? get tripDate => throw _privateConstructorUsedError;
+  String? get tripTime => throw _privateConstructorUsedError;
+  String? get routeName => throw _privateConstructorUsedError;
+  int? get minutesLeft => throw _privateConstructorUsedError;
 
   /// Serializes this SeatHoldModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,12 +52,16 @@ abstract class $SeatHoldModelCopyWith<$Res> {
   @useResult
   $Res call({
     int id,
-    String expiresAt,
     String seatNumber,
+    String expiresAt,
     HoldStatus status,
     String createdAt,
     int tripId,
     int userId,
+    String? tripDate,
+    String? tripTime,
+    String? routeName,
+    int? minutesLeft,
   });
 }
 
@@ -73,12 +81,16 @@ class _$SeatHoldModelCopyWithImpl<$Res, $Val extends SeatHoldModel>
   @override
   $Res call({
     Object? id = null,
-    Object? expiresAt = null,
     Object? seatNumber = null,
+    Object? expiresAt = null,
     Object? status = null,
     Object? createdAt = null,
     Object? tripId = null,
     Object? userId = null,
+    Object? tripDate = freezed,
+    Object? tripTime = freezed,
+    Object? routeName = freezed,
+    Object? minutesLeft = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -86,13 +98,13 @@ class _$SeatHoldModelCopyWithImpl<$Res, $Val extends SeatHoldModel>
                 ? _value.id
                 : id // ignore: cast_nullable_to_non_nullable
                       as int,
-            expiresAt: null == expiresAt
-                ? _value.expiresAt
-                : expiresAt // ignore: cast_nullable_to_non_nullable
-                      as String,
             seatNumber: null == seatNumber
                 ? _value.seatNumber
                 : seatNumber // ignore: cast_nullable_to_non_nullable
+                      as String,
+            expiresAt: null == expiresAt
+                ? _value.expiresAt
+                : expiresAt // ignore: cast_nullable_to_non_nullable
                       as String,
             status: null == status
                 ? _value.status
@@ -110,6 +122,22 @@ class _$SeatHoldModelCopyWithImpl<$Res, $Val extends SeatHoldModel>
                 ? _value.userId
                 : userId // ignore: cast_nullable_to_non_nullable
                       as int,
+            tripDate: freezed == tripDate
+                ? _value.tripDate
+                : tripDate // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            tripTime: freezed == tripTime
+                ? _value.tripTime
+                : tripTime // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            routeName: freezed == routeName
+                ? _value.routeName
+                : routeName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            minutesLeft: freezed == minutesLeft
+                ? _value.minutesLeft
+                : minutesLeft // ignore: cast_nullable_to_non_nullable
+                      as int?,
           )
           as $Val,
     );
@@ -127,12 +155,16 @@ abstract class _$$SeatHoldModelImplCopyWith<$Res>
   @useResult
   $Res call({
     int id,
-    String expiresAt,
     String seatNumber,
+    String expiresAt,
     HoldStatus status,
     String createdAt,
     int tripId,
     int userId,
+    String? tripDate,
+    String? tripTime,
+    String? routeName,
+    int? minutesLeft,
   });
 }
 
@@ -151,12 +183,16 @@ class __$$SeatHoldModelImplCopyWithImpl<$Res>
   @override
   $Res call({
     Object? id = null,
-    Object? expiresAt = null,
     Object? seatNumber = null,
+    Object? expiresAt = null,
     Object? status = null,
     Object? createdAt = null,
     Object? tripId = null,
     Object? userId = null,
+    Object? tripDate = freezed,
+    Object? tripTime = freezed,
+    Object? routeName = freezed,
+    Object? minutesLeft = freezed,
   }) {
     return _then(
       _$SeatHoldModelImpl(
@@ -164,13 +200,13 @@ class __$$SeatHoldModelImplCopyWithImpl<$Res>
             ? _value.id
             : id // ignore: cast_nullable_to_non_nullable
                   as int,
-        expiresAt: null == expiresAt
-            ? _value.expiresAt
-            : expiresAt // ignore: cast_nullable_to_non_nullable
-                  as String,
         seatNumber: null == seatNumber
             ? _value.seatNumber
             : seatNumber // ignore: cast_nullable_to_non_nullable
+                  as String,
+        expiresAt: null == expiresAt
+            ? _value.expiresAt
+            : expiresAt // ignore: cast_nullable_to_non_nullable
                   as String,
         status: null == status
             ? _value.status
@@ -188,6 +224,22 @@ class __$$SeatHoldModelImplCopyWithImpl<$Res>
             ? _value.userId
             : userId // ignore: cast_nullable_to_non_nullable
                   as int,
+        tripDate: freezed == tripDate
+            ? _value.tripDate
+            : tripDate // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        tripTime: freezed == tripTime
+            ? _value.tripTime
+            : tripTime // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        routeName: freezed == routeName
+            ? _value.routeName
+            : routeName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        minutesLeft: freezed == minutesLeft
+            ? _value.minutesLeft
+            : minutesLeft // ignore: cast_nullable_to_non_nullable
+                  as int?,
       ),
     );
   }
@@ -198,12 +250,16 @@ class __$$SeatHoldModelImplCopyWithImpl<$Res>
 class _$SeatHoldModelImpl implements _SeatHoldModel {
   const _$SeatHoldModelImpl({
     required this.id,
-    required this.expiresAt,
     required this.seatNumber,
+    required this.expiresAt,
     required this.status,
     required this.createdAt,
     required this.tripId,
     required this.userId,
+    this.tripDate,
+    this.tripTime,
+    this.routeName,
+    this.minutesLeft,
   });
 
   factory _$SeatHoldModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -212,9 +268,9 @@ class _$SeatHoldModelImpl implements _SeatHoldModel {
   @override
   final int id;
   @override
-  final String expiresAt;
-  @override
   final String seatNumber;
+  @override
+  final String expiresAt;
   @override
   final HoldStatus status;
   @override
@@ -223,10 +279,18 @@ class _$SeatHoldModelImpl implements _SeatHoldModel {
   final int tripId;
   @override
   final int userId;
+  @override
+  final String? tripDate;
+  @override
+  final String? tripTime;
+  @override
+  final String? routeName;
+  @override
+  final int? minutesLeft;
 
   @override
   String toString() {
-    return 'SeatHoldModel(id: $id, expiresAt: $expiresAt, seatNumber: $seatNumber, status: $status, createdAt: $createdAt, tripId: $tripId, userId: $userId)';
+    return 'SeatHoldModel(id: $id, seatNumber: $seatNumber, expiresAt: $expiresAt, status: $status, createdAt: $createdAt, tripId: $tripId, userId: $userId, tripDate: $tripDate, tripTime: $tripTime, routeName: $routeName, minutesLeft: $minutesLeft)';
   }
 
   @override
@@ -235,15 +299,23 @@ class _$SeatHoldModelImpl implements _SeatHoldModel {
         (other.runtimeType == runtimeType &&
             other is _$SeatHoldModelImpl &&
             (identical(other.id, id) || other.id == id) &&
-            (identical(other.expiresAt, expiresAt) ||
-                other.expiresAt == expiresAt) &&
             (identical(other.seatNumber, seatNumber) ||
                 other.seatNumber == seatNumber) &&
+            (identical(other.expiresAt, expiresAt) ||
+                other.expiresAt == expiresAt) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.tripId, tripId) || other.tripId == tripId) &&
-            (identical(other.userId, userId) || other.userId == userId));
+            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.tripDate, tripDate) ||
+                other.tripDate == tripDate) &&
+            (identical(other.tripTime, tripTime) ||
+                other.tripTime == tripTime) &&
+            (identical(other.routeName, routeName) ||
+                other.routeName == routeName) &&
+            (identical(other.minutesLeft, minutesLeft) ||
+                other.minutesLeft == minutesLeft));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -251,12 +323,16 @@ class _$SeatHoldModelImpl implements _SeatHoldModel {
   int get hashCode => Object.hash(
     runtimeType,
     id,
-    expiresAt,
     seatNumber,
+    expiresAt,
     status,
     createdAt,
     tripId,
     userId,
+    tripDate,
+    tripTime,
+    routeName,
+    minutesLeft,
   );
 
   /// Create a copy of SeatHoldModel
@@ -276,12 +352,16 @@ class _$SeatHoldModelImpl implements _SeatHoldModel {
 abstract class _SeatHoldModel implements SeatHoldModel {
   const factory _SeatHoldModel({
     required final int id,
-    required final String expiresAt,
     required final String seatNumber,
+    required final String expiresAt,
     required final HoldStatus status,
     required final String createdAt,
     required final int tripId,
     required final int userId,
+    final String? tripDate,
+    final String? tripTime,
+    final String? routeName,
+    final int? minutesLeft,
   }) = _$SeatHoldModelImpl;
 
   factory _SeatHoldModel.fromJson(Map<String, dynamic> json) =
@@ -290,9 +370,9 @@ abstract class _SeatHoldModel implements SeatHoldModel {
   @override
   int get id;
   @override
-  String get expiresAt;
-  @override
   String get seatNumber;
+  @override
+  String get expiresAt;
   @override
   HoldStatus get status;
   @override
@@ -301,6 +381,14 @@ abstract class _SeatHoldModel implements SeatHoldModel {
   int get tripId;
   @override
   int get userId;
+  @override
+  String? get tripDate;
+  @override
+  String? get tripTime;
+  @override
+  String? get routeName;
+  @override
+  int? get minutesLeft;
 
   /// Create a copy of SeatHoldModel
   /// with the given fields replaced by the non-null parameter values.
@@ -320,6 +408,8 @@ SeatHoldCreateRequest _$SeatHoldCreateRequestFromJson(
 mixin _$SeatHoldCreateRequest {
   int get tripId => throw _privateConstructorUsedError;
   String get seatNumber => throw _privateConstructorUsedError;
+  int get fromStopId => throw _privateConstructorUsedError;
+  int get toStopId => throw _privateConstructorUsedError;
 
   /// Serializes this SeatHoldCreateRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -338,7 +428,7 @@ abstract class $SeatHoldCreateRequestCopyWith<$Res> {
     $Res Function(SeatHoldCreateRequest) then,
   ) = _$SeatHoldCreateRequestCopyWithImpl<$Res, SeatHoldCreateRequest>;
   @useResult
-  $Res call({int tripId, String seatNumber});
+  $Res call({int tripId, String seatNumber, int fromStopId, int toStopId});
 }
 
 /// @nodoc
@@ -358,7 +448,12 @@ class _$SeatHoldCreateRequestCopyWithImpl<
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? tripId = null, Object? seatNumber = null}) {
+  $Res call({
+    Object? tripId = null,
+    Object? seatNumber = null,
+    Object? fromStopId = null,
+    Object? toStopId = null,
+  }) {
     return _then(
       _value.copyWith(
             tripId: null == tripId
@@ -369,6 +464,14 @@ class _$SeatHoldCreateRequestCopyWithImpl<
                 ? _value.seatNumber
                 : seatNumber // ignore: cast_nullable_to_non_nullable
                       as String,
+            fromStopId: null == fromStopId
+                ? _value.fromStopId
+                : fromStopId // ignore: cast_nullable_to_non_nullable
+                      as int,
+            toStopId: null == toStopId
+                ? _value.toStopId
+                : toStopId // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -384,7 +487,7 @@ abstract class _$$SeatHoldCreateRequestImplCopyWith<$Res>
   ) = __$$SeatHoldCreateRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int tripId, String seatNumber});
+  $Res call({int tripId, String seatNumber, int fromStopId, int toStopId});
 }
 
 /// @nodoc
@@ -401,7 +504,12 @@ class __$$SeatHoldCreateRequestImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? tripId = null, Object? seatNumber = null}) {
+  $Res call({
+    Object? tripId = null,
+    Object? seatNumber = null,
+    Object? fromStopId = null,
+    Object? toStopId = null,
+  }) {
     return _then(
       _$SeatHoldCreateRequestImpl(
         tripId: null == tripId
@@ -412,6 +520,14 @@ class __$$SeatHoldCreateRequestImplCopyWithImpl<$Res>
             ? _value.seatNumber
             : seatNumber // ignore: cast_nullable_to_non_nullable
                   as String,
+        fromStopId: null == fromStopId
+            ? _value.fromStopId
+            : fromStopId // ignore: cast_nullable_to_non_nullable
+                  as int,
+        toStopId: null == toStopId
+            ? _value.toStopId
+            : toStopId // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -423,6 +539,8 @@ class _$SeatHoldCreateRequestImpl implements _SeatHoldCreateRequest {
   const _$SeatHoldCreateRequestImpl({
     required this.tripId,
     required this.seatNumber,
+    required this.fromStopId,
+    required this.toStopId,
   });
 
   factory _$SeatHoldCreateRequestImpl.fromJson(Map<String, dynamic> json) =>
@@ -432,10 +550,14 @@ class _$SeatHoldCreateRequestImpl implements _SeatHoldCreateRequest {
   final int tripId;
   @override
   final String seatNumber;
+  @override
+  final int fromStopId;
+  @override
+  final int toStopId;
 
   @override
   String toString() {
-    return 'SeatHoldCreateRequest(tripId: $tripId, seatNumber: $seatNumber)';
+    return 'SeatHoldCreateRequest(tripId: $tripId, seatNumber: $seatNumber, fromStopId: $fromStopId, toStopId: $toStopId)';
   }
 
   @override
@@ -445,12 +567,17 @@ class _$SeatHoldCreateRequestImpl implements _SeatHoldCreateRequest {
             other is _$SeatHoldCreateRequestImpl &&
             (identical(other.tripId, tripId) || other.tripId == tripId) &&
             (identical(other.seatNumber, seatNumber) ||
-                other.seatNumber == seatNumber));
+                other.seatNumber == seatNumber) &&
+            (identical(other.fromStopId, fromStopId) ||
+                other.fromStopId == fromStopId) &&
+            (identical(other.toStopId, toStopId) ||
+                other.toStopId == toStopId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, tripId, seatNumber);
+  int get hashCode =>
+      Object.hash(runtimeType, tripId, seatNumber, fromStopId, toStopId);
 
   /// Create a copy of SeatHoldCreateRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -474,6 +601,8 @@ abstract class _SeatHoldCreateRequest implements SeatHoldCreateRequest {
   const factory _SeatHoldCreateRequest({
     required final int tripId,
     required final String seatNumber,
+    required final int fromStopId,
+    required final int toStopId,
   }) = _$SeatHoldCreateRequestImpl;
 
   factory _SeatHoldCreateRequest.fromJson(Map<String, dynamic> json) =
@@ -483,6 +612,10 @@ abstract class _SeatHoldCreateRequest implements SeatHoldCreateRequest {
   int get tripId;
   @override
   String get seatNumber;
+  @override
+  int get fromStopId;
+  @override
+  int get toStopId;
 
   /// Create a copy of SeatHoldCreateRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -500,8 +633,7 @@ SeatHoldUpdateRequest _$SeatHoldUpdateRequestFromJson(
 
 /// @nodoc
 mixin _$SeatHoldUpdateRequest {
-  String? get expiresAt => throw _privateConstructorUsedError;
-  HoldStatus? get status => throw _privateConstructorUsedError;
+  HoldStatus get status => throw _privateConstructorUsedError;
 
   /// Serializes this SeatHoldUpdateRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -520,7 +652,7 @@ abstract class $SeatHoldUpdateRequestCopyWith<$Res> {
     $Res Function(SeatHoldUpdateRequest) then,
   ) = _$SeatHoldUpdateRequestCopyWithImpl<$Res, SeatHoldUpdateRequest>;
   @useResult
-  $Res call({String? expiresAt, HoldStatus? status});
+  $Res call({HoldStatus status});
 }
 
 /// @nodoc
@@ -540,17 +672,13 @@ class _$SeatHoldUpdateRequestCopyWithImpl<
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? expiresAt = freezed, Object? status = freezed}) {
+  $Res call({Object? status = null}) {
     return _then(
       _value.copyWith(
-            expiresAt: freezed == expiresAt
-                ? _value.expiresAt
-                : expiresAt // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            status: freezed == status
+            status: null == status
                 ? _value.status
                 : status // ignore: cast_nullable_to_non_nullable
-                      as HoldStatus?,
+                      as HoldStatus,
           )
           as $Val,
     );
@@ -566,7 +694,7 @@ abstract class _$$SeatHoldUpdateRequestImplCopyWith<$Res>
   ) = __$$SeatHoldUpdateRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? expiresAt, HoldStatus? status});
+  $Res call({HoldStatus status});
 }
 
 /// @nodoc
@@ -583,17 +711,13 @@ class __$$SeatHoldUpdateRequestImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? expiresAt = freezed, Object? status = freezed}) {
+  $Res call({Object? status = null}) {
     return _then(
       _$SeatHoldUpdateRequestImpl(
-        expiresAt: freezed == expiresAt
-            ? _value.expiresAt
-            : expiresAt // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        status: freezed == status
+        status: null == status
             ? _value.status
             : status // ignore: cast_nullable_to_non_nullable
-                  as HoldStatus?,
+                  as HoldStatus,
       ),
     );
   }
@@ -602,19 +726,17 @@ class __$$SeatHoldUpdateRequestImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$SeatHoldUpdateRequestImpl implements _SeatHoldUpdateRequest {
-  const _$SeatHoldUpdateRequestImpl({this.expiresAt, this.status});
+  const _$SeatHoldUpdateRequestImpl({required this.status});
 
   factory _$SeatHoldUpdateRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$SeatHoldUpdateRequestImplFromJson(json);
 
   @override
-  final String? expiresAt;
-  @override
-  final HoldStatus? status;
+  final HoldStatus status;
 
   @override
   String toString() {
-    return 'SeatHoldUpdateRequest(expiresAt: $expiresAt, status: $status)';
+    return 'SeatHoldUpdateRequest(status: $status)';
   }
 
   @override
@@ -622,14 +744,12 @@ class _$SeatHoldUpdateRequestImpl implements _SeatHoldUpdateRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$SeatHoldUpdateRequestImpl &&
-            (identical(other.expiresAt, expiresAt) ||
-                other.expiresAt == expiresAt) &&
             (identical(other.status, status) || other.status == status));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, expiresAt, status);
+  int get hashCode => Object.hash(runtimeType, status);
 
   /// Create a copy of SeatHoldUpdateRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -650,18 +770,14 @@ class _$SeatHoldUpdateRequestImpl implements _SeatHoldUpdateRequest {
 }
 
 abstract class _SeatHoldUpdateRequest implements SeatHoldUpdateRequest {
-  const factory _SeatHoldUpdateRequest({
-    final String? expiresAt,
-    final HoldStatus? status,
-  }) = _$SeatHoldUpdateRequestImpl;
+  const factory _SeatHoldUpdateRequest({required final HoldStatus status}) =
+      _$SeatHoldUpdateRequestImpl;
 
   factory _SeatHoldUpdateRequest.fromJson(Map<String, dynamic> json) =
       _$SeatHoldUpdateRequestImpl.fromJson;
 
   @override
-  String? get expiresAt;
-  @override
-  HoldStatus? get status;
+  HoldStatus get status;
 
   /// Create a copy of SeatHoldUpdateRequest
   /// with the given fields replaced by the non-null parameter values.

@@ -129,9 +129,9 @@ class ChangePasswordRequest with _$ChangePasswordRequest {
 @freezed
 class UserSelfUpdateRequest with _$UserSelfUpdateRequest {
   const factory UserSelfUpdateRequest({
-    String? username,
-    String? phone,
-    String? dateOfBirth,
+    required String username,
+    required String phone,
+    required String email,
   }) = _UserSelfUpdateRequest;
 
   factory UserSelfUpdateRequest.fromJson(Map<String, dynamic> json) =>
@@ -164,6 +164,10 @@ class UserCreateRequest with _$UserCreateRequest {
 // DTO usado por ADMIN para actualizar usuarios existentes
 @freezed
 class UserUpdateRequest with _$UserUpdateRequest {
+  @JsonSerializable(
+    explicitToJson: true,
+    includeIfNull: false,
+  )
   const factory UserUpdateRequest({
     String? username,
     String? email,

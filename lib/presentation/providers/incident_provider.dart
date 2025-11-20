@@ -1,17 +1,12 @@
-import 'package:bus_connect/core/network/api_client.dart';
-import 'package:bus_connect/data/providers/incident_api_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/incident_model/incident_model.dart';
 import '../../data/repositories/incident_repository.dart';
 import '../../core/constants/enums/entity_type.dart';
 import '../../core/constants/enums/incident_type.dart';
+import 'package:bus_connect/app.dart';
 
-/// ==================== REPOSITORY PROVIDER ====================
-final incidentRepositoryProvider = Provider<IncidentRepository>((ref) {
-    final dio = ApiClient().dio;
-    final apiProvider = IncidentApiProvider(dio);
-    return IncidentRepository(apiProvider);
-  });
+
+
 /// ==================== STATE ====================
 class IncidentState {
   final List<IncidentResponse> incidents;

@@ -9,9 +9,11 @@ class StopModel with _$StopModel {
     required int id,
     required String name,
     required int order,
-    double? lat,
-    double? lng,
-    int? routeId,
+    required double lat,
+    required double lng,
+    required int routeId,
+    String? routeName,
+    String? routeCode,
   }) = _StopModel;
 
   factory StopModel.fromJson(Map<String, dynamic> json) =>
@@ -21,11 +23,11 @@ class StopModel with _$StopModel {
 @freezed
 class StopCreateRequest with _$StopCreateRequest {
   const factory StopCreateRequest({
-    required int routeId,
     required String name,
     required int order,
-    double? lat,
-    double? lng,
+    required double lat,
+    required double lng,
+    required int routeId,
   }) = _StopCreateRequest;
 
   factory StopCreateRequest.fromJson(Map<String, dynamic> json) =>
@@ -35,10 +37,8 @@ class StopCreateRequest with _$StopCreateRequest {
 @freezed
 class StopUpdateRequest with _$StopUpdateRequest {
   const factory StopUpdateRequest({
-    String? name,
-    int? order,
-    double? lat,
-    double? lng,
+    required String name,
+    required int order,
   }) = _StopUpdateRequest;
 
   factory StopUpdateRequest.fromJson(Map<String, dynamic> json) =>

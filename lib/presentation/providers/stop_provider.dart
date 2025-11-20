@@ -1,3 +1,4 @@
+import 'package:bus_connect/app.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bus_connect/presentation/providers/auth_provider.dart';
 import '../../data/models/stop_model/stop_model.dart';
@@ -15,7 +16,12 @@ final stopRepositoryProvider = Provider<StopRepository>((ref) {
   final apiProvider = ref.watch(stopApiProvider);
   return StopRepository(apiProvider);
 });
-
+/*
+final routeStopsProvider = FutureProvider.autoDispose.family<List<StopModel>, int>((ref, routeId) async {
+  final routeApi = ref.read(routeApiProvider.notifier);
+  return await routeApi.getRouteStops(routeId);
+});
+*/
 /// ==================== STATE ====================
 class StopState {
   final List<StopResponse> stops;

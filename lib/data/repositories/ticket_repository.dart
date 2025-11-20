@@ -9,6 +9,8 @@ class TicketRepository {
 
   TicketRepository(this._apiProvider);
 
+  // ==================== TICKET CRUD ====================
+
   Future<Either<Failure, TicketResponse>> createTicket(
       TicketCreateRequest request,
       ) async {
@@ -20,9 +22,50 @@ class TicketRepository {
     }
   }
 
+  Future<Either<Failure, TicketResponse>> updateTicket(
+      int id,
+      TicketUpdateRequest request,
+      ) async {
+    try {
+      final response = await _apiProvider.updateTicket(id, request);
+      return Right(response);
+    } on DioException catch (e) {
+      return Left(_handleError(e));
+    }
+  }
+
+  Future<Either<Failure, void>> deleteTicket(int id) async {
+    try {
+      await _apiProvider.deleteTicket(id);
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(_handleError(e));
+    }
+  }
+
+  Future<Either<Failure, TicketResponse>> cancelTicket(int id) async {
+    try {
+      final response = await _apiProvider.cancelTicket(id);
+      return Right(response);
+    } on DioException catch (e) {
+      return Left(_handleError(e));
+    }
+  }
+
+  // ==================== TICKET QUERIES ====================
+
   Future<Either<Failure, List<TicketResponse>>> getMyTickets() async {
     try {
       final response = await _apiProvider.getMyTickets();
+      return Right(response);
+    } on DioException catch (e) {
+      return Left(_handleError(e));
+    }
+  }
+
+  Future<Either<Failure, List<TicketResponse>>> getAllTickets() async {
+    try {
+      final response = await _apiProvider.getAllTickets();
       return Right(response);
     } on DioException catch (e) {
       return Left(_handleError(e));
@@ -69,14 +112,18 @@ class TicketRepository {
     }
   }
 
-  Future<Either<Failure, TicketResponse>> cancelTicket(int id) async {
+  Future<Either<Failure, List<TicketResponse>>> getTicketsByPassenger(
+      int passengerId,
+      ) async {
     try {
-      final response = await _apiProvider.cancelTicket(id);
+      final response = await _apiProvider.getTicketsByPassenger(passengerId);
       return Right(response);
     } on DioException catch (e) {
       return Left(_handleError(e));
     }
   }
+
+  // ==================== TICKET ACTIONS ====================
 
   Future<Either<Failure, TicketResponse>> markAsUsed(int id) async {
     try {
@@ -86,6 +133,17 @@ class TicketRepository {
       return Left(_handleError(e));
     }
   }
+
+  Future<Either<Failure, TicketResponse>> markAsNoShow(int id) async {
+    try {
+      final response = await _apiProvider.markAsNoShow(id);
+      return Right(response);
+    } on DioException catch (e) {
+      return Left(_handleError(e));
+    }
+  }
+
+  // ==================== TICKET VALIDATION ====================
 
   Future<Either<Failure, bool>> isSeatAvailable(
       int tripId,
@@ -99,13 +157,25 @@ class TicketRepository {
     }
   }
 
+  Future<Either<Failure, int>> countSoldTicketsByTrip(int tripId) async {
+    try {
+      final response = await _apiProvider.countSoldTicketsByTrip(tripId);
+      return Right(response);
+    } on DioException catch (e) {
+      return Left(_handleError(e));
+    }
+  }
+
+  // ==================== ERROR HANDLER ====================
+
   Failure _handleError(DioException e) {
     if (e.type == DioExceptionType.connectionTimeout ||
         e.type == DioExceptionType.receiveTimeout) {
       return const NetworkFailure();
     }
 
-    final message = e.response?.data['message'] ?? 'Error al procesar la solicitud';
+    final message =
+        e.response?.data['message'] ?? 'Error al procesar la solicitud';
     return ServerFailure(message);
   }
 }

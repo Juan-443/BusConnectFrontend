@@ -426,6 +426,7 @@ mixin _$AssignmentCreateRequest {
   int get tripId => throw _privateConstructorUsedError;
   int get driverId => throw _privateConstructorUsedError;
   int get dispatcherId => throw _privateConstructorUsedError;
+  bool? get checklistOk => throw _privateConstructorUsedError;
 
   /// Serializes this AssignmentCreateRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -444,7 +445,7 @@ abstract class $AssignmentCreateRequestCopyWith<$Res> {
     $Res Function(AssignmentCreateRequest) then,
   ) = _$AssignmentCreateRequestCopyWithImpl<$Res, AssignmentCreateRequest>;
   @useResult
-  $Res call({int tripId, int driverId, int dispatcherId});
+  $Res call({int tripId, int driverId, int dispatcherId, bool? checklistOk});
 }
 
 /// @nodoc
@@ -468,6 +469,7 @@ class _$AssignmentCreateRequestCopyWithImpl<
     Object? tripId = null,
     Object? driverId = null,
     Object? dispatcherId = null,
+    Object? checklistOk = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -483,6 +485,10 @@ class _$AssignmentCreateRequestCopyWithImpl<
                 ? _value.dispatcherId
                 : dispatcherId // ignore: cast_nullable_to_non_nullable
                       as int,
+            checklistOk: freezed == checklistOk
+                ? _value.checklistOk
+                : checklistOk // ignore: cast_nullable_to_non_nullable
+                      as bool?,
           )
           as $Val,
     );
@@ -498,7 +504,7 @@ abstract class _$$AssignmentCreateRequestImplCopyWith<$Res>
   ) = __$$AssignmentCreateRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int tripId, int driverId, int dispatcherId});
+  $Res call({int tripId, int driverId, int dispatcherId, bool? checklistOk});
 }
 
 /// @nodoc
@@ -522,6 +528,7 @@ class __$$AssignmentCreateRequestImplCopyWithImpl<$Res>
     Object? tripId = null,
     Object? driverId = null,
     Object? dispatcherId = null,
+    Object? checklistOk = freezed,
   }) {
     return _then(
       _$AssignmentCreateRequestImpl(
@@ -537,6 +544,10 @@ class __$$AssignmentCreateRequestImplCopyWithImpl<$Res>
             ? _value.dispatcherId
             : dispatcherId // ignore: cast_nullable_to_non_nullable
                   as int,
+        checklistOk: freezed == checklistOk
+            ? _value.checklistOk
+            : checklistOk // ignore: cast_nullable_to_non_nullable
+                  as bool?,
       ),
     );
   }
@@ -549,6 +560,7 @@ class _$AssignmentCreateRequestImpl implements _AssignmentCreateRequest {
     required this.tripId,
     required this.driverId,
     required this.dispatcherId,
+    this.checklistOk,
   });
 
   factory _$AssignmentCreateRequestImpl.fromJson(Map<String, dynamic> json) =>
@@ -560,10 +572,12 @@ class _$AssignmentCreateRequestImpl implements _AssignmentCreateRequest {
   final int driverId;
   @override
   final int dispatcherId;
+  @override
+  final bool? checklistOk;
 
   @override
   String toString() {
-    return 'AssignmentCreateRequest(tripId: $tripId, driverId: $driverId, dispatcherId: $dispatcherId)';
+    return 'AssignmentCreateRequest(tripId: $tripId, driverId: $driverId, dispatcherId: $dispatcherId, checklistOk: $checklistOk)';
   }
 
   @override
@@ -575,12 +589,15 @@ class _$AssignmentCreateRequestImpl implements _AssignmentCreateRequest {
             (identical(other.driverId, driverId) ||
                 other.driverId == driverId) &&
             (identical(other.dispatcherId, dispatcherId) ||
-                other.dispatcherId == dispatcherId));
+                other.dispatcherId == dispatcherId) &&
+            (identical(other.checklistOk, checklistOk) ||
+                other.checklistOk == checklistOk));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, tripId, driverId, dispatcherId);
+  int get hashCode =>
+      Object.hash(runtimeType, tripId, driverId, dispatcherId, checklistOk);
 
   /// Create a copy of AssignmentCreateRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -604,6 +621,7 @@ abstract class _AssignmentCreateRequest implements AssignmentCreateRequest {
     required final int tripId,
     required final int driverId,
     required final int dispatcherId,
+    final bool? checklistOk,
   }) = _$AssignmentCreateRequestImpl;
 
   factory _AssignmentCreateRequest.fromJson(Map<String, dynamic> json) =
@@ -615,6 +633,8 @@ abstract class _AssignmentCreateRequest implements AssignmentCreateRequest {
   int get driverId;
   @override
   int get dispatcherId;
+  @override
+  bool? get checklistOk;
 
   /// Create a copy of AssignmentCreateRequest
   /// with the given fields replaced by the non-null parameter values.

@@ -36,6 +36,7 @@ class AssignmentCreateRequest with _$AssignmentCreateRequest {
     required int tripId,
     required int driverId,
     required int dispatcherId,
+    bool? checklistOk,
   }) = _AssignmentCreateRequest;
 
   factory AssignmentCreateRequest.fromJson(Map<String, dynamic> json) =>

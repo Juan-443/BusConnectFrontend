@@ -261,7 +261,7 @@ class _BusApiProvider implements BusApiProvider {
   }
 
   @override
-  Future<BusModel> changeBusStatus(int id, BusStatus status) async {
+  Future<BusModel> changeBusStatus(int id, String status) async {
     final _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{r'status': status};
     final _headers = <String, dynamic>{};

@@ -28,9 +28,13 @@ mixin _$TripModel {
   TripStatus get status => throw _privateConstructorUsedError;
   int get routeId => throw _privateConstructorUsedError;
   int? get busId => throw _privateConstructorUsedError;
+  String? get routeName => throw _privateConstructorUsedError;
+  String? get origin => throw _privateConstructorUsedError;
+  String? get destination => throw _privateConstructorUsedError;
+  String? get busPlate => throw _privateConstructorUsedError;
+  int? get capacity => throw _privateConstructorUsedError;
   RouteModel? get route => throw _privateConstructorUsedError;
   BusModel? get bus => throw _privateConstructorUsedError;
-  int? get capacity => throw _privateConstructorUsedError;
 
   /// Serializes this TripModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -55,9 +59,13 @@ abstract class $TripModelCopyWith<$Res> {
     TripStatus status,
     int routeId,
     int? busId,
+    String? routeName,
+    String? origin,
+    String? destination,
+    String? busPlate,
+    int? capacity,
     RouteModel? route,
     BusModel? bus,
-    int? capacity,
   });
 
   $RouteModelCopyWith<$Res>? get route;
@@ -86,9 +94,13 @@ class _$TripModelCopyWithImpl<$Res, $Val extends TripModel>
     Object? status = null,
     Object? routeId = null,
     Object? busId = freezed,
+    Object? routeName = freezed,
+    Object? origin = freezed,
+    Object? destination = freezed,
+    Object? busPlate = freezed,
+    Object? capacity = freezed,
     Object? route = freezed,
     Object? bus = freezed,
-    Object? capacity = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -120,6 +132,26 @@ class _$TripModelCopyWithImpl<$Res, $Val extends TripModel>
                 ? _value.busId
                 : busId // ignore: cast_nullable_to_non_nullable
                       as int?,
+            routeName: freezed == routeName
+                ? _value.routeName
+                : routeName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            origin: freezed == origin
+                ? _value.origin
+                : origin // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            destination: freezed == destination
+                ? _value.destination
+                : destination // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            busPlate: freezed == busPlate
+                ? _value.busPlate
+                : busPlate // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            capacity: freezed == capacity
+                ? _value.capacity
+                : capacity // ignore: cast_nullable_to_non_nullable
+                      as int?,
             route: freezed == route
                 ? _value.route
                 : route // ignore: cast_nullable_to_non_nullable
@@ -128,10 +160,6 @@ class _$TripModelCopyWithImpl<$Res, $Val extends TripModel>
                 ? _value.bus
                 : bus // ignore: cast_nullable_to_non_nullable
                       as BusModel?,
-            capacity: freezed == capacity
-                ? _value.capacity
-                : capacity // ignore: cast_nullable_to_non_nullable
-                      as int?,
           )
           as $Val,
     );
@@ -183,9 +211,13 @@ abstract class _$$TripModelImplCopyWith<$Res>
     TripStatus status,
     int routeId,
     int? busId,
+    String? routeName,
+    String? origin,
+    String? destination,
+    String? busPlate,
+    int? capacity,
     RouteModel? route,
     BusModel? bus,
-    int? capacity,
   });
 
   @override
@@ -215,9 +247,13 @@ class __$$TripModelImplCopyWithImpl<$Res>
     Object? status = null,
     Object? routeId = null,
     Object? busId = freezed,
+    Object? routeName = freezed,
+    Object? origin = freezed,
+    Object? destination = freezed,
+    Object? busPlate = freezed,
+    Object? capacity = freezed,
     Object? route = freezed,
     Object? bus = freezed,
-    Object? capacity = freezed,
   }) {
     return _then(
       _$TripModelImpl(
@@ -249,6 +285,26 @@ class __$$TripModelImplCopyWithImpl<$Res>
             ? _value.busId
             : busId // ignore: cast_nullable_to_non_nullable
                   as int?,
+        routeName: freezed == routeName
+            ? _value.routeName
+            : routeName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        origin: freezed == origin
+            ? _value.origin
+            : origin // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        destination: freezed == destination
+            ? _value.destination
+            : destination // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        busPlate: freezed == busPlate
+            ? _value.busPlate
+            : busPlate // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        capacity: freezed == capacity
+            ? _value.capacity
+            : capacity // ignore: cast_nullable_to_non_nullable
+                  as int?,
         route: freezed == route
             ? _value.route
             : route // ignore: cast_nullable_to_non_nullable
@@ -257,10 +313,6 @@ class __$$TripModelImplCopyWithImpl<$Res>
             ? _value.bus
             : bus // ignore: cast_nullable_to_non_nullable
                   as BusModel?,
-        capacity: freezed == capacity
-            ? _value.capacity
-            : capacity // ignore: cast_nullable_to_non_nullable
-                  as int?,
       ),
     );
   }
@@ -277,9 +329,13 @@ class _$TripModelImpl implements _TripModel {
     required this.status,
     required this.routeId,
     this.busId,
+    this.routeName,
+    this.origin,
+    this.destination,
+    this.busPlate,
+    this.capacity,
     this.route,
     this.bus,
-    this.capacity,
   });
 
   factory _$TripModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -300,15 +356,23 @@ class _$TripModelImpl implements _TripModel {
   @override
   final int? busId;
   @override
+  final String? routeName;
+  @override
+  final String? origin;
+  @override
+  final String? destination;
+  @override
+  final String? busPlate;
+  @override
+  final int? capacity;
+  @override
   final RouteModel? route;
   @override
   final BusModel? bus;
-  @override
-  final int? capacity;
 
   @override
   String toString() {
-    return 'TripModel(id: $id, date: $date, departureAt: $departureAt, arrivalEta: $arrivalEta, status: $status, routeId: $routeId, busId: $busId, route: $route, bus: $bus, capacity: $capacity)';
+    return 'TripModel(id: $id, date: $date, departureAt: $departureAt, arrivalEta: $arrivalEta, status: $status, routeId: $routeId, busId: $busId, routeName: $routeName, origin: $origin, destination: $destination, busPlate: $busPlate, capacity: $capacity, route: $route, bus: $bus)';
   }
 
   @override
@@ -325,10 +389,17 @@ class _$TripModelImpl implements _TripModel {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.routeId, routeId) || other.routeId == routeId) &&
             (identical(other.busId, busId) || other.busId == busId) &&
-            (identical(other.route, route) || other.route == route) &&
-            (identical(other.bus, bus) || other.bus == bus) &&
+            (identical(other.routeName, routeName) ||
+                other.routeName == routeName) &&
+            (identical(other.origin, origin) || other.origin == origin) &&
+            (identical(other.destination, destination) ||
+                other.destination == destination) &&
+            (identical(other.busPlate, busPlate) ||
+                other.busPlate == busPlate) &&
             (identical(other.capacity, capacity) ||
-                other.capacity == capacity));
+                other.capacity == capacity) &&
+            (identical(other.route, route) || other.route == route) &&
+            (identical(other.bus, bus) || other.bus == bus));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -342,9 +413,13 @@ class _$TripModelImpl implements _TripModel {
     status,
     routeId,
     busId,
+    routeName,
+    origin,
+    destination,
+    busPlate,
+    capacity,
     route,
     bus,
-    capacity,
   );
 
   /// Create a copy of TripModel
@@ -370,9 +445,13 @@ abstract class _TripModel implements TripModel {
     required final TripStatus status,
     required final int routeId,
     final int? busId,
+    final String? routeName,
+    final String? origin,
+    final String? destination,
+    final String? busPlate,
+    final int? capacity,
     final RouteModel? route,
     final BusModel? bus,
-    final int? capacity,
   }) = _$TripModelImpl;
 
   factory _TripModel.fromJson(Map<String, dynamic> json) =
@@ -393,11 +472,19 @@ abstract class _TripModel implements TripModel {
   @override
   int? get busId;
   @override
+  String? get routeName;
+  @override
+  String? get origin;
+  @override
+  String? get destination;
+  @override
+  String? get busPlate;
+  @override
+  int? get capacity;
+  @override
   RouteModel? get route;
   @override
   BusModel? get bus;
-  @override
-  int? get capacity;
 
   /// Create a copy of TripModel
   /// with the given fields replaced by the non-null parameter values.
@@ -414,9 +501,8 @@ TripCreateRequest _$TripCreateRequestFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$TripCreateRequest {
   int get routeId => throw _privateConstructorUsedError;
-  DateTime get date => throw _privateConstructorUsedError; // "YYYY-MM-DD"
-  DateTime get departureAt =>
-      throw _privateConstructorUsedError; // "YYYY-MM-DDTHH:mm:ss"
+  DateTime get date => throw _privateConstructorUsedError;
+  DateTime get departureAt => throw _privateConstructorUsedError;
   DateTime? get arrivalEta => throw _privateConstructorUsedError;
   int? get busId => throw _privateConstructorUsedError;
 
@@ -578,10 +664,8 @@ class _$TripCreateRequestImpl implements _TripCreateRequest {
   final int routeId;
   @override
   final DateTime date;
-  // "YYYY-MM-DD"
   @override
   final DateTime departureAt;
-  // "YYYY-MM-DDTHH:mm:ss"
   @override
   final DateTime? arrivalEta;
   @override
@@ -643,9 +727,9 @@ abstract class _TripCreateRequest implements TripCreateRequest {
   @override
   int get routeId;
   @override
-  DateTime get date; // "YYYY-MM-DD"
+  DateTime get date;
   @override
-  DateTime get departureAt; // "YYYY-MM-DDTHH:mm:ss"
+  DateTime get departureAt;
   @override
   DateTime? get arrivalEta;
   @override

@@ -1,15 +1,8 @@
-import 'package:bus_connect/core/network/api_client.dart';
-import 'package:bus_connect/data/providers/fare_rule_api_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/fare_rule_model/fare_rule_model.dart';
 import '../../data/repositories/fare_rule_repository.dart';
+import 'package:bus_connect/app.dart';
 
-/// ==================== REPOSITORY PROVIDER ====================
-final fareRuleRepositoryProvider = Provider<FareRuleRepository>((ref) {
-  final dio = ApiClient().dio;
-  final apiProvider = FareRuleApiProvider(dio);
-  return FareRuleRepository(apiProvider);
-});
 
 /// ==================== STATE ====================
 class FareRuleState {
@@ -33,13 +26,14 @@ class FareRuleState {
     bool? isLoading,
     String? error,
     int? filterRouteId,
+    bool clearFilter = false,
   }) {
     return FareRuleState(
       fareRules: fareRules ?? this.fareRules,
       selectedFareRule: selectedFareRule ?? this.selectedFareRule,
       isLoading: isLoading ?? this.isLoading,
       error: error,
-      filterRouteId: filterRouteId ?? this.filterRouteId,
+      filterRouteId: clearFilter ? null : (filterRouteId ?? this.filterRouteId),
     );
   }
 
@@ -62,7 +56,7 @@ class FareRuleNotifier extends StateNotifier<FareRuleState> {
   // ==================== FETCH ====================
 
   Future<void> fetchAllFareRules() async {
-    state = state.copyWith(isLoading: true);
+    state = state.copyWith(isLoading: true, error: null);
     final result = await _repository.getAllFareRules();
 
     result.fold(
@@ -70,7 +64,6 @@ class FareRuleNotifier extends StateNotifier<FareRuleState> {
           (fareRules) => state = state.copyWith(
         fareRules: fareRules,
         isLoading: false,
-        error: null,
       ),
     );
   }
@@ -168,8 +161,6 @@ class FareRuleNotifier extends StateNotifier<FareRuleState> {
         state = state.copyWith(
           fareRules: updated,
           selectedFareRule: fareRule,
-          isLoading: false,
-          error: null,
         );
         return true;
       },
@@ -189,9 +180,7 @@ class FareRuleNotifier extends StateNotifier<FareRuleState> {
         final updated = state.fareRules.where((f) => f.id != id).toList();
         state = state.copyWith(
           fareRules: updated,
-          selectedFareRule: null,
           isLoading: false,
-          error: null,
         );
         return true;
       },
@@ -214,11 +203,11 @@ class FareRuleNotifier extends StateNotifier<FareRuleState> {
   // ==================== FILTERS ====================
 
   void setRouteFilter(int? routeId) {
-    state = state.copyWith(filterRouteId: routeId);
+    state = state.copyWith(filterRouteId: routeId, clearFilter: routeId == null);
   }
 
   void clearFilter() {
-    state = state.copyWith(filterRouteId: null);
+    state = state.copyWith(selectedFareRule: null);
   }
 
   // ==================== HELPERS ====================
@@ -227,9 +216,6 @@ class FareRuleNotifier extends StateNotifier<FareRuleState> {
     state = state.copyWith(selectedFareRule: null);
   }
 
-  void selectFareRule(FareRuleResponse fareRule) {
-    state = state.copyWith(selectedFareRule: fareRule);
-  }
 }
 
 /// ==================== PROVIDER ====================

@@ -1,4 +1,5 @@
 import 'package:bus_connect/core/constants/enums/user_role.dart';
+import 'package:bus_connect/presentation/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -51,22 +52,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      final user = ref.read(authProvider).user; // Obtener usuario logeado
-      if (user == null) return;
+      final user = ref.read(authProvider).user;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error al cargar datos de usuario'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+      await ref.read(currentUserProvider.notifier).setUser(
+        userId: user.id,
+        userName: user.username,
+        userEmail: user.email,
+        userRole: user.role.name,
+      );
 
+      final currentUser = ref.read(currentUserProvider);
+      if (!currentUser.isAuthenticated) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error al cargar sesión'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
       // Redirigir según rol
       switch (user.role) {
         case UserRole.ADMIN:
-          context.go(AppRoutes.adminDashboard); // Define esta ruta en AppRoutes
+          context.go(AppRoutes.adminDashboard);
           break;
         case UserRole.DISPATCHER:
-          context.go(AppRoutes.dispatcherDashboard); // ejemplo
+          context.go(AppRoutes.dispatcherDashboard);
           break;
         case UserRole.DRIVER:
-          context.go(AppRoutes.home); // ejemplo
+          context.go(AppRoutes.home);
           break;
+        case UserRole.PASSENGER:
+          context.go(AppRoutes.passengerDashboard);
         default:
-          context.go(AppRoutes.home); // fallback
+          context.go(AppRoutes.home);
           break;
       }
     } else {

@@ -24,6 +24,19 @@ class AuthRepository {
       await _storage.saveString(StorageKeys.userEmail, response.user.email);
       await _storage.saveString(StorageKeys.userName, response.user.username);
 
+      // ⭐ AGREGA ESTO AQUÍ
+      print('=== TOKENS GUARDADOS EN LOGIN ===');
+      print('Access Token (primeros 50): ${response.accessToken.substring(0, 50)}...');
+      print('Access Token length: ${response.accessToken.length}');
+      print('Refresh Token (primeros 50): ${response.refreshToken.substring(0, 50)}...');
+      print('Refresh Token length: ${response.refreshToken.length}');
+
+      // Verificar que se guardaron
+      final savedAccess = await _storage.getSecureData(StorageKeys.accessToken);
+      final savedRefresh = await _storage.getSecureData(StorageKeys.refreshToken);
+      print('✅ Verificación - Access guardado: ${savedAccess?.substring(0, 30)}...');
+      print('✅ Verificación - Refresh guardado: ${savedRefresh?.substring(0, 30)}...');
+
       return Right(response);
     } on DioException catch (e) {
       return Left(_handleDioError(e));

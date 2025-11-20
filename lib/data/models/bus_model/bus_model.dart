@@ -23,6 +23,7 @@ class BusModel with _$BusModel {
 
 @freezed
 class BusCreateRequest with _$BusCreateRequest {
+  @JsonSerializable(explicitToJson: true)
   const factory BusCreateRequest({
     required String plate,
     required int capacity,
@@ -36,6 +37,7 @@ class BusCreateRequest with _$BusCreateRequest {
 
 @freezed
 class BusUpdateRequest with _$BusUpdateRequest {
+  @JsonSerializable(explicitToJson: true)
   const factory BusUpdateRequest({
     String? plate,
     int? capacity,

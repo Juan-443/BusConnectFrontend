@@ -1,17 +1,10 @@
-// lib/presentation/providers/overbooking_provider.dart
-
 import 'package:bus_connect/app.dart';
-import 'package:bus_connect/data/providers/overbooking_api_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dartz/dartz.dart';
 import '../../data/models/overbooking_model/overbooking_model.dart';
 import '../../data/repositories/overbooking_repository.dart';
 import '../../core/errors/failures.dart';
 
-final overbookingApiProvider = Provider<OverbookingApiProvider>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return OverbookingApiProvider(apiClient.dio);
-});
 // ==================== STATE ====================
 class OverbookingState {
   final List<OverbookingResponse> requests;

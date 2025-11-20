@@ -15,13 +15,17 @@ _$TripModelImpl _$$TripModelImplFromJson(Map<String, dynamic> json) =>
       status: $enumDecode(_$TripStatusEnumMap, json['status']),
       routeId: (json['routeId'] as num).toInt(),
       busId: (json['busId'] as num?)?.toInt(),
+      routeName: json['routeName'] as String?,
+      origin: json['origin'] as String?,
+      destination: json['destination'] as String?,
+      busPlate: json['busPlate'] as String?,
+      capacity: (json['capacity'] as num?)?.toInt(),
       route: json['route'] == null
           ? null
           : RouteModel.fromJson(json['route'] as Map<String, dynamic>),
       bus: json['bus'] == null
           ? null
           : BusModel.fromJson(json['bus'] as Map<String, dynamic>),
-      capacity: (json['capacity'] as num?)?.toInt(),
     );
 
 Map<String, dynamic> _$$TripModelImplToJson(_$TripModelImpl instance) =>
@@ -33,9 +37,13 @@ Map<String, dynamic> _$$TripModelImplToJson(_$TripModelImpl instance) =>
       'status': _$TripStatusEnumMap[instance.status]!,
       'routeId': instance.routeId,
       'busId': instance.busId,
+      'routeName': instance.routeName,
+      'origin': instance.origin,
+      'destination': instance.destination,
+      'busPlate': instance.busPlate,
+      'capacity': instance.capacity,
       'route': instance.route,
       'bus': instance.bus,
-      'capacity': instance.capacity,
     };
 
 const _$TripStatusEnumMap = {

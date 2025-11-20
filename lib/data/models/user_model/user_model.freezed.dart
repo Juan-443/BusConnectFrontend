@@ -1686,9 +1686,9 @@ UserSelfUpdateRequest _$UserSelfUpdateRequestFromJson(
 
 /// @nodoc
 mixin _$UserSelfUpdateRequest {
-  String? get username => throw _privateConstructorUsedError;
-  String? get phone => throw _privateConstructorUsedError;
-  String? get dateOfBirth => throw _privateConstructorUsedError;
+  String get username => throw _privateConstructorUsedError;
+  String get phone => throw _privateConstructorUsedError;
+  String get email => throw _privateConstructorUsedError;
 
   /// Serializes this UserSelfUpdateRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -1707,7 +1707,7 @@ abstract class $UserSelfUpdateRequestCopyWith<$Res> {
     $Res Function(UserSelfUpdateRequest) then,
   ) = _$UserSelfUpdateRequestCopyWithImpl<$Res, UserSelfUpdateRequest>;
   @useResult
-  $Res call({String? username, String? phone, String? dateOfBirth});
+  $Res call({String username, String phone, String email});
 }
 
 /// @nodoc
@@ -1728,24 +1728,24 @@ class _$UserSelfUpdateRequestCopyWithImpl<
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? username = freezed,
-    Object? phone = freezed,
-    Object? dateOfBirth = freezed,
+    Object? username = null,
+    Object? phone = null,
+    Object? email = null,
   }) {
     return _then(
       _value.copyWith(
-            username: freezed == username
+            username: null == username
                 ? _value.username
                 : username // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            phone: freezed == phone
+                      as String,
+            phone: null == phone
                 ? _value.phone
                 : phone // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            dateOfBirth: freezed == dateOfBirth
-                ? _value.dateOfBirth
-                : dateOfBirth // ignore: cast_nullable_to_non_nullable
-                      as String?,
+                      as String,
+            email: null == email
+                ? _value.email
+                : email // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -1761,7 +1761,7 @@ abstract class _$$UserSelfUpdateRequestImplCopyWith<$Res>
   ) = __$$UserSelfUpdateRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? username, String? phone, String? dateOfBirth});
+  $Res call({String username, String phone, String email});
 }
 
 /// @nodoc
@@ -1779,24 +1779,24 @@ class __$$UserSelfUpdateRequestImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? username = freezed,
-    Object? phone = freezed,
-    Object? dateOfBirth = freezed,
+    Object? username = null,
+    Object? phone = null,
+    Object? email = null,
   }) {
     return _then(
       _$UserSelfUpdateRequestImpl(
-        username: freezed == username
+        username: null == username
             ? _value.username
             : username // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        phone: freezed == phone
+                  as String,
+        phone: null == phone
             ? _value.phone
             : phone // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        dateOfBirth: freezed == dateOfBirth
-            ? _value.dateOfBirth
-            : dateOfBirth // ignore: cast_nullable_to_non_nullable
-                  as String?,
+                  as String,
+        email: null == email
+            ? _value.email
+            : email // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -1806,24 +1806,24 @@ class __$$UserSelfUpdateRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserSelfUpdateRequestImpl implements _UserSelfUpdateRequest {
   const _$UserSelfUpdateRequestImpl({
-    this.username,
-    this.phone,
-    this.dateOfBirth,
+    required this.username,
+    required this.phone,
+    required this.email,
   });
 
   factory _$UserSelfUpdateRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserSelfUpdateRequestImplFromJson(json);
 
   @override
-  final String? username;
+  final String username;
   @override
-  final String? phone;
+  final String phone;
   @override
-  final String? dateOfBirth;
+  final String email;
 
   @override
   String toString() {
-    return 'UserSelfUpdateRequest(username: $username, phone: $phone, dateOfBirth: $dateOfBirth)';
+    return 'UserSelfUpdateRequest(username: $username, phone: $phone, email: $email)';
   }
 
   @override
@@ -1834,13 +1834,12 @@ class _$UserSelfUpdateRequestImpl implements _UserSelfUpdateRequest {
             (identical(other.username, username) ||
                 other.username == username) &&
             (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.dateOfBirth, dateOfBirth) ||
-                other.dateOfBirth == dateOfBirth));
+            (identical(other.email, email) || other.email == email));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, username, phone, dateOfBirth);
+  int get hashCode => Object.hash(runtimeType, username, phone, email);
 
   /// Create a copy of UserSelfUpdateRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -1862,20 +1861,20 @@ class _$UserSelfUpdateRequestImpl implements _UserSelfUpdateRequest {
 
 abstract class _UserSelfUpdateRequest implements UserSelfUpdateRequest {
   const factory _UserSelfUpdateRequest({
-    final String? username,
-    final String? phone,
-    final String? dateOfBirth,
+    required final String username,
+    required final String phone,
+    required final String email,
   }) = _$UserSelfUpdateRequestImpl;
 
   factory _UserSelfUpdateRequest.fromJson(Map<String, dynamic> json) =
       _$UserSelfUpdateRequestImpl.fromJson;
 
   @override
-  String? get username;
+  String get username;
   @override
-  String? get phone;
+  String get phone;
   @override
-  String? get dateOfBirth;
+  String get email;
 
   /// Create a copy of UserSelfUpdateRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -2413,7 +2412,8 @@ class __$$UserUpdateRequestImplCopyWithImpl<$Res>
 }
 
 /// @nodoc
-@JsonSerializable()
+
+@JsonSerializable(explicitToJson: true, includeIfNull: false)
 class _$UserUpdateRequestImpl implements _UserUpdateRequest {
   const _$UserUpdateRequestImpl({
     this.username,

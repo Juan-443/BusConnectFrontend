@@ -1,3 +1,6 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+@JsonEnum()
 enum BusStatus {
   ACTIVE,
   MAINTENANCE,
@@ -13,4 +16,16 @@ enum BusStatus {
         return 'Inactivo';
     }
   }
+
 }
+extension BusStatusExtension on BusStatus {
+  String toJson() => name.toUpperCase();
+
+  static BusStatus fromJson(String json) {
+    return BusStatus.values.firstWhere(
+          (e) => e.name.toUpperCase() == json.toUpperCase(),
+      orElse: () => BusStatus.INACTIVE,
+    );
+  }
+}
+

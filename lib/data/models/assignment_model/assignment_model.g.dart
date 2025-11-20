@@ -46,6 +46,7 @@ _$AssignmentCreateRequestImpl _$$AssignmentCreateRequestImplFromJson(
   tripId: (json['tripId'] as num).toInt(),
   driverId: (json['driverId'] as num).toInt(),
   dispatcherId: (json['dispatcherId'] as num).toInt(),
+  checklistOk: json['checklistOk'] as bool?,
 );
 
 Map<String, dynamic> _$$AssignmentCreateRequestImplToJson(
@@ -54,6 +55,7 @@ Map<String, dynamic> _$$AssignmentCreateRequestImplToJson(
   'tripId': instance.tripId,
   'driverId': instance.driverId,
   'dispatcherId': instance.dispatcherId,
+  'checklistOk': instance.checklistOk,
 };
 
 _$AssignmentUpdateRequestImpl _$$AssignmentUpdateRequestImplFromJson(

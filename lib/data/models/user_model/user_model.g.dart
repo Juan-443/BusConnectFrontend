@@ -139,9 +139,9 @@ Map<String, dynamic> _$$ChangePasswordRequestImplToJson(
 _$UserSelfUpdateRequestImpl _$$UserSelfUpdateRequestImplFromJson(
   Map<String, dynamic> json,
 ) => _$UserSelfUpdateRequestImpl(
-  username: json['username'] as String?,
-  phone: json['phone'] as String?,
-  dateOfBirth: json['dateOfBirth'] as String?,
+  username: json['username'] as String,
+  phone: json['phone'] as String,
+  email: json['email'] as String,
 );
 
 Map<String, dynamic> _$$UserSelfUpdateRequestImplToJson(
@@ -149,7 +149,7 @@ Map<String, dynamic> _$$UserSelfUpdateRequestImplToJson(
 ) => <String, dynamic>{
   'username': instance.username,
   'phone': instance.phone,
-  'dateOfBirth': instance.dateOfBirth,
+  'email': instance.email,
 };
 
 _$UserCreateRequestImpl _$$UserCreateRequestImplFromJson(
@@ -193,13 +193,14 @@ _$UserUpdateRequestImpl _$$UserUpdateRequestImplFromJson(
 Map<String, dynamic> _$$UserUpdateRequestImplToJson(
   _$UserUpdateRequestImpl instance,
 ) => <String, dynamic>{
-  'username': instance.username,
-  'email': instance.email,
-  'phone': instance.phone,
-  'password': instance.password,
-  'role': _$UserRoleEnumMap[instance.role],
-  'status': _$UserStatusEnumMap[instance.status],
-  'dateOfBirth': _dateToJsonNullable(instance.dateOfBirth),
+  if (instance.username case final value?) 'username': value,
+  if (instance.email case final value?) 'email': value,
+  if (instance.phone case final value?) 'phone': value,
+  if (instance.password case final value?) 'password': value,
+  if (_$UserRoleEnumMap[instance.role] case final value?) 'role': value,
+  if (_$UserStatusEnumMap[instance.status] case final value?) 'status': value,
+  if (_dateToJsonNullable(instance.dateOfBirth) case final value?)
+    'dateOfBirth': value,
 };
 
 _$MessageResponseImpl _$$MessageResponseImplFromJson(

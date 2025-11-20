@@ -1,4 +1,5 @@
 import 'package:bus_connect/data/models/user_model/user_model.dart';
+import 'package:bus_connect/presentation/providers/current_user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -99,7 +100,46 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!mounted) return;
 
     if (success) {
-      context.go(AppRoutes.home);
+      final user = ref.read(authProvider).user;
+
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error al cargar datos de usuario'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      await ref.read(currentUserProvider.notifier).setUser(
+        userId: user.id,
+        userName: user.username,
+        userEmail: user.email,
+        userRole: user.role.name,
+      );
+
+
+      final currentUser = ref.read(currentUserProvider);
+
+      if (!currentUser.isAuthenticated) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Error al cargar sesión'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+        return;
+      }
+
+      context.go(AppRoutes.passengerDashboard);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('¡Bienvenido ${user.username}!'),
+          backgroundColor: Colors.green,
+        ),
+      );
     } else {
       final error = ref.read(authProvider).error;
       ScaffoldMessenger.of(context).showSnackBar(

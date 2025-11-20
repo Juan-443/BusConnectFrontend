@@ -5,8 +5,9 @@ import 'auth_interceptor.dart';
 
 class ApiClient {
   late final Dio _dio;
+  final Function()? onUnauthorized;
 
-  ApiClient() {
+  ApiClient({this.onUnauthorized}) {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiConstants.baseUrl,
@@ -20,9 +21,8 @@ class ApiClient {
       ),
     );
 
-    // Interceptores
     _dio.interceptors.addAll([
-      AuthInterceptor(_dio),
+      AuthInterceptor(_dio, onUnauthorized: onUnauthorized),
       PrettyDioLogger(
         requestHeader: true,
         requestBody: true,

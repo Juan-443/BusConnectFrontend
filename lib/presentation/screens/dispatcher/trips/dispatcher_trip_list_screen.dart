@@ -1,113 +1,13 @@
-import 'package:bus_connect/app.dart';
+import 'package:bus_connect/core/constants/app_routes.dart';
 import 'package:bus_connect/data/models/trip_model/trip_model.dart';
-import 'package:bus_connect/data/providers/trip_api_provider.dart';
-import 'package:bus_connect/data/repositories/trip_repository.dart';
+import 'package:bus_connect/presentation/providers/trips_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/enums/trip_status.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../widgets/common/loading_indicator.dart';
 import '../../../widgets/common/error_widget.dart' as custom;
-
-// ================== Providers ==================
-final tripApiProvider = Provider<TripApiProvider>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return TripApiProvider(apiClient.dio);
-});
-
-final tripRepositoryProvider = Provider<TripRepository>((ref) {
-  final apiProvider = ref.watch(tripApiProvider);
-  return TripRepository(apiProvider);
-});
-
-// ================== State ==================
-class TripsState {
-  final List<TripResponse> trips;
-  final bool isLoading;
-  final String? error;
-  final TripResponse? selectedTrip;
-
-  const TripsState({
-    this.trips = const [],
-    this.isLoading = false,
-    this.error,
-    this.selectedTrip,
-  });
-
-  TripsState copyWith({
-    List<TripResponse>? trips,
-    bool? isLoading,
-    String? error,
-    TripResponse? selectedTrip,
-  }) {
-    return TripsState(
-      trips: trips ?? this.trips,
-      isLoading: isLoading ?? this.isLoading,
-      error: error,
-      selectedTrip: selectedTrip ?? this.selectedTrip,
-    );
-  }
-}
-
-// ================== Notifier ==================
-class TripsNotifier extends StateNotifier<TripsState> {
-  final TripRepository _repository;
-
-  TripsNotifier(this._repository) : super(const TripsState());
-
-  Future<void> fetchTodayTrips() async {
-    state = state.copyWith(isLoading: true, error: null);
-    final result = await _repository.getTodayTrips();
-    result.fold(
-          (failure) => state = state.copyWith(isLoading: false, error: failure.message),
-          (trips) => state = state.copyWith(isLoading: false, trips: trips),
-    );
-  }
-
-  Future<void> fetchTripsByDate(String date) async {
-    state = state.copyWith(isLoading: true, error: null);
-    // Ajuste: usamos searchTrips con parámetro date
-    final result = await _repository.searchTrips(date: date);
-    result.fold(
-          (failure) => state = state.copyWith(isLoading: false, error: failure.message),
-          (trips) => state = state.copyWith(isLoading: false, trips: trips),
-    );
-  }
-
-  Future<bool> changeTripStatus(int tripId, TripStatus status) async {
-    final result = await _repository.changeTripStatus(tripId, status);
-    return result.fold((_) => false, (trip) {
-      final updatedTrips = state.trips.map((t) {
-        if (t.id == tripId) return t.copyWith(status: status);
-        return t;
-      }).toList();
-      state = state.copyWith(trips: updatedTrips);
-      return true;
-    });
-  }
-
-  Future<bool> cancelTrip(int tripId) async {
-    final result = await _repository.cancelTrip(tripId);
-    return result.fold((_) => false, (trip) {
-      final updatedTrips = state.trips.map((t) {
-        if (t.id == tripId) return t.copyWith(status: TripStatus.CANCELLED);
-        return t;
-      }).toList();
-      state = state.copyWith(trips: updatedTrips);
-      return true;
-    });
-  }
-
-  void selectTrip(TripResponse trip) {
-    state = state.copyWith(selectedTrip: trip);
-  }
-}
-
-// ================== StateNotifierProvider ==================
-final tripNotifierProvider = StateNotifierProvider<TripsNotifier, TripsState>((ref) {
-  final repository = ref.watch(tripRepositoryProvider);
-  return TripsNotifier(repository);
-});
 
 // ================== Pantalla ==================
 class DispatcherTripListScreen extends ConsumerStatefulWidget {
@@ -126,13 +26,13 @@ class _DispatcherTripListScreenState extends ConsumerState<DispatcherTripListScr
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(tripNotifierProvider.notifier).fetchTodayTrips();
+      ref.read(tripSearchProvider.notifier).getTodayTrips();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(tripNotifierProvider);
+    final state = ref.watch(tripSearchProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -151,7 +51,7 @@ class _DispatcherTripListScreenState extends ConsumerState<DispatcherTripListScr
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => Navigator.pushNamed(context, '/dispatcher/trips/create'),
+        onPressed: () => context.go(AppRoutes.adminTickets),
         icon: const Icon(Icons.add),
         label: const Text('Nuevo Viaje'),
       ),
@@ -181,7 +81,7 @@ class _DispatcherTripListScreenState extends ConsumerState<DispatcherTripListScr
         label: Text(DateFormatter.formatDate(_selectedDate!)),
         onDeleted: () {
           setState(() => _selectedDate = null);
-          ref.read(tripNotifierProvider.notifier).fetchTodayTrips();
+          ref.read(tripSearchProvider.notifier).getTodayTrips();
         },
       ),
     );
@@ -214,12 +114,12 @@ class _DispatcherTripListScreenState extends ConsumerState<DispatcherTripListScr
     );
   }
 
-  Widget _buildTripList(TripsState state) {
+  Widget _buildTripList(TripSearchState state) {
     if (state.isLoading) return const LoadingIndicator();
     if (state.error != null) {
       return custom.ErrorDisplay(
         message: state.error!,
-        onRetry: () => ref.read(tripNotifierProvider.notifier).fetchTodayTrips(),
+        onRetry: () => ref.read(tripSearchProvider.notifier).getTodayTrips(),
       );
     }
 
@@ -242,10 +142,10 @@ class _DispatcherTripListScreenState extends ConsumerState<DispatcherTripListScr
     return RefreshIndicator(
       onRefresh: () async {
         if (_selectedDate == null) {
-          await ref.read(tripNotifierProvider.notifier).fetchTodayTrips();
+          await ref.read(tripSearchProvider.notifier).getTodayTrips();
         } else {
           final dateStr = _selectedDate!.toIso8601String().split('T')[0];
-          await ref.read(tripNotifierProvider.notifier).fetchTripsByDate(dateStr);
+          await ref.read(tripSearchProvider.notifier).fetchTripsByDate(dateStr);
         }
       },
       child: ListView.builder(
@@ -337,7 +237,7 @@ class _DispatcherTripListScreenState extends ConsumerState<DispatcherTripListScr
     if (picked != null && mounted) {
       setState(() => _selectedDate = picked);
       final dateStr = picked.toIso8601String().split('T')[0];
-      ref.read(tripNotifierProvider.notifier).fetchTripsByDate(dateStr);
+      ref.read(tripSearchProvider.notifier).fetchTripsByDate(dateStr);
     }
   }
 

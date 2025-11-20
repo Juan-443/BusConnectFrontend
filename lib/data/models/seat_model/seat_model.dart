@@ -12,6 +12,8 @@ class SeatModel with _$SeatModel {
     required String number,
     required SeatType type,
     required int busId,
+    String? busPlate,
+    int? busCapacity,
   }) = _SeatModel;
 
   factory SeatModel.fromJson(Map<String, dynamic> json) =>

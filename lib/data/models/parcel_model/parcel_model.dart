@@ -19,13 +19,11 @@ class ParcelModel with _$ParcelModel {
     required ParcelStatus status,
     String? proofPhotoUrl,
     String? deliveryOtp,
-    required String createdAt,
+    DateTime? createdAt,
     String? deliveredAt,
     required int fromStopId,
     required int toStopId,
     int? tripId,
-    StopModel? fromStop,
-    StopModel? toStop,
   }) = _ParcelModel;
 
   factory ParcelModel.fromJson(Map<String, dynamic> json) =>
@@ -42,6 +40,7 @@ class ParcelCreateRequest with _$ParcelCreateRequest {
     required double price,
     required int fromStopId,
     required int toStopId,
+    int? tripId
   }) = _ParcelCreateRequest;
 
   factory ParcelCreateRequest.fromJson(Map<String, dynamic> json) =>

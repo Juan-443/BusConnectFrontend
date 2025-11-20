@@ -1,3 +1,24 @@
+import 'package:bus_connect/presentation/screens/admin/buses/bus_detail_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/fare_rule/fare_rule_form_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/fare_rule/fare_rule_list_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/routes/route_detail_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/routes/route_stops_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/seats/bus_seats_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/stops/stop_form_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/stops/stop_list_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/tickets/tickets_list_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/trip/from_screen.dart';
+import 'package:bus_connect/presentation/screens/admin/trip/trips_list_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/booking/booking_confirmation_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/booking/booking_success_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/dashboard/passenger_dashboard_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/parcel/parcel_tracking_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/profile/profile_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/seat/seat_selection_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/ticket/my_tickets_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/ticket/ticket_detail_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/trip/trip_detail_screen.dart';
+import 'package:bus_connect/presentation/screens/passenger/trip/trip_search_screen.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,19 +40,6 @@ import '../../presentation/screens/admin/config/config_list_screen.dart';
 import '../../presentation/screens/admin/incidents/incident_list_screen.dart';
 
 // Passenger screens
-import '../../presentation/screens/home/home_screen.dart';
-import '../../presentation/screens/trip/search_trips_screen.dart';
-import '../../presentation/screens/trip/trip_detail_screen.dart';
-import '../../presentation/screens/tickets/select_seats_screen.dart';
-import '../../presentation/screens/tickets/passenger_info_screen.dart';
-import '../../presentation/screens/tickets/payment_screen.dart';
-import '../../presentation/screens/tickets/my_tickets_screen.dart';
-import '../../presentation/screens/tickets/ticket_detail_screen.dart';
-import '../../presentation/screens/parcel/create_parcel_screen.dart';
-import '../../presentation/screens/parcel/track_parcel_screen.dart';
-import '../../presentation/screens/profile/profile_screen.dart';
-import '../../presentation/screens/profile/edit_profile_screen.dart';
-
 import '../constants/app_routes.dart';
 import '../../core/constants/enums/user_role.dart';
 import '../../presentation/providers/auth_provider.dart';
@@ -40,7 +48,7 @@ import '../../presentation/providers/auth_provider.dart';
 import '../../presentation/screens/dispatcher/dashboard/dispatcher_dashboard_screen.dart';
 import '../../presentation/screens/dispatcher/trips/dispatcher_trip_list_screen.dart';
 import '../../presentation/screens/dispatcher/trips/trip_form_screen.dart';
-import '../../presentation/screens/dispatcher/assignments/assignment_create_screen.dart';
+import '../../presentation/screens/dispatcher/assignments/assignment_from_screen.dart';
 import '../../presentation/screens/dispatcher/overbooking/overbooking_list_screen.dart';
 
 class AppRouter {
@@ -71,49 +79,327 @@ class AppRouter {
 
     routes: [
       // ==================== AUTH ====================
-      GoRoute(path: AppRoutes.login, builder: (context, state) => const LoginScreen()),
-      GoRoute(path: AppRoutes.register, builder: (context, state) => const RegisterScreen()),
-      GoRoute(path: AppRoutes.forgotPassword, builder: (context, state) => const ForgotPasswordScreen()),
+      GoRoute(
+        path: AppRoutes.login,
+        name: 'login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.register,
+        name: 'register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        name: 'forgotPassword',
+        builder: (context, state) => const ForgotPasswordScreen(),
+      ),
 
       // ==================== ADMIN ====================
-      GoRoute(path: AppRoutes.adminDashboard, builder: (context, state) => const AdminDashboardScreen()),
-      GoRoute(path: AppRoutes.adminUsers, builder: (context, state) => const UserListScreen()),
-      GoRoute(path: AppRoutes.adminUserCreate, builder: (context, state) => const UserFormScreen()),
-      GoRoute(path: AppRoutes.adminUserEdit, builder: (context, state) => const UserFormScreen(isEdit: true)),
-      GoRoute(path: AppRoutes.adminBuses, builder: (context, state) => const BusListScreen()),
-      GoRoute(path: AppRoutes.adminBusCreate, builder: (context, state) => const BusFormScreen()),
-      GoRoute(path: AppRoutes.adminBusEdit, builder: (context, state) => const BusFormScreen(isEdit: true)),
-      GoRoute(path: AppRoutes.adminRoutes, builder: (context, state) => const RouteListScreen()),
-      GoRoute(path: AppRoutes.adminRouteCreate, builder: (context, state) => const RouteFormScreen()),
-      GoRoute(path: AppRoutes.adminRouteEdit, builder: (context, state) => const RouteFormScreen(isEdit: true)),
-      GoRoute(path: AppRoutes.adminAssignments, builder: (context, state) => const AssignmentListScreen()),
-      GoRoute(path: AppRoutes.adminConfig, builder: (context, state) => const ConfigListScreen()),
-      GoRoute(path: AppRoutes.adminIncidents, builder: (context, state) => const IncidentListScreen()),
+      GoRoute(
+        path: AppRoutes.adminDashboard,
+        name: 'adminDashboard',
+        builder: (context, state) => const AdminDashboardScreen(),
+      ),
+
+      // ----- USERS -----
+      GoRoute(
+        path: AppRoutes.adminUsers,
+        name: 'adminUsers',
+        builder: (context, state) => const UserListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminUserCreate,
+        name: 'adminUserCreate',
+        builder: (context, state) => const UserFormScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.adminUserEdit}/:userId',
+        name: 'adminUserEdit',
+        builder: (context, state) {
+          final userId = int.parse(state.pathParameters['userId']!);
+          return UserFormScreen(
+            isEdit: true,
+            userId: userId,
+            showPasswordField: true,
+          );
+        },
+      ),
+
+      // ----- BUSES -----
+      GoRoute(
+        path: AppRoutes.adminBuses,
+        name: 'adminBuses',
+        builder: (context, state) => const BusListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminBusCreate,
+        name: 'adminBusCreate',
+        builder: (context, state) => const BusFormScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.adminBusEdit}/:busId',
+        name: 'adminBusEdit',
+        builder: (context, state) {
+          final busId = int.parse(state.pathParameters['busId']!);
+          return BusFormScreen(isEdit: true, busId: busId);
+        },
+      ),
+      GoRoute(
+        path: '${AppRoutes.adminBusDetail}/:id',
+        name: 'adminBusDetail',
+        builder: (context, state) {
+          final busId = int.parse(state.pathParameters['id']!);
+          return BusDetailScreen(busId: busId);
+        },
+      ),
+      GoRoute(
+        path: '${AppRoutes.adminBusSeats}/:busId',
+        name: 'adminBusSeats',
+        builder: (context, state) {
+          final busId = int.parse(state.pathParameters['busId']!);
+          final extra = state.extra as Map<String, dynamic>?;
+          final busPlate = extra?['plate'] as String? ?? 'Bus $busId';
+          return BusSeatsScreen(busId: busId, busPlate: busPlate);
+        },
+      ),
+
+      // ----- ROUTES -----
+      GoRoute(
+        path: AppRoutes.adminRoutes,
+        name: 'adminRoutes',
+        builder: (context, state) => const RoutesListScreen(),
+        routes: [
+          GoRoute(
+            path: 'create',
+            name: 'adminRouteCreate',
+            builder: (context, state) => const RouteFormScreen(),
+          ),
+          GoRoute(
+            path: 'edit/:routeId',
+            name: 'adminRouteEdit',
+            builder: (context, state) {
+              final routeId = int.parse(state.pathParameters['routeId']!);
+              return RouteFormScreen(routeId: routeId);
+            },
+          ),
+          GoRoute(
+            path: ':id',
+            name: 'adminRouteDetail',
+            builder: (context, state) {
+              final routeId = int.parse(state.pathParameters['id']!);
+              return RouteDetailScreen(routeId: routeId);
+            },
+          ),
+          GoRoute(
+            path: ':id/stops',
+            name: AppRoutes.adminRouteStopsName,
+            builder: (context, state) {
+              final routeId = int.parse(state.pathParameters['id']!);
+              final routeName = state.extra as String?;
+              return RouteStopsScreen(
+                routeId: routeId,
+                routeName: routeName ?? 'Ruta #$routeId',
+              );
+            },
+          ),
+        ],
+      ),
+
+      // ----- STOPS -----
+      GoRoute(
+        path: AppRoutes.adminStops,
+        name: 'adminStops',
+        builder: (context, state) => const StopListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminStopCreate,
+        name: 'adminStopCreate',
+        builder: (context, state) => const StopFormScreen(),
+      ),
+
+      // ----- FARE RULES -----
+      GoRoute(
+        path: AppRoutes.adminFareRules,
+        name: 'adminFareRules',
+        builder: (context, state) => const FareRuleListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminFareRuleCreate,
+        name: 'adminFareRuleCreate',
+        builder: (context, state) => const FareRuleFormScreen(),
+      ),
+
+      // ----- ASSIGNMENTS -----
+      GoRoute(
+        path: AppRoutes.adminAssignments,
+        name: 'adminAssignments',
+        builder: (context, state) => const AssignmentsListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminAssignmentCreate,
+        name: 'adminAssignmentCreate',
+        builder: (context, state) => const AssignmentFormScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminAssignmentEdit,
+        name: 'adminAssignmentEdit',
+        builder: (context, state) => const AssignmentFormScreen(isEdit: true),
+      ),
+
+      // ----- CONFIG -----
+      GoRoute(
+        path: AppRoutes.adminConfig,
+        name: 'adminConfig',
+        builder: (context, state) => const ConfigsListScreen(),
+      ),
+
+      // ----- INCIDENTS -----
+      GoRoute(
+        path: AppRoutes.adminIncidents,
+        name: 'adminIncidents',
+        builder: (context, state) => const IncidentsListScreen(),
+      ),
+
+      // ----- TICKETS -----
+      GoRoute(
+        path: AppRoutes.adminTickets,
+        name: 'adminTickets',
+        builder: (context, state) => const AdminTicketsListScreen(),
+      ),
+
+      // ----- TRIPS -----
+      GoRoute(
+        path: AppRoutes.adminTrips,
+        name: 'adminTrips',
+        builder: (context, state) => const TripsListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.adminTripsCreate,
+        name: 'adminTripsCreate',
+        builder: (context, state) => const TripFormScreen(),
+      ),
 
       // ==================== PASSENGER ====================
-      GoRoute(path: AppRoutes.home, builder: (context, state) => const HomeScreen()),
-      GoRoute(path: AppRoutes.searchTrips, builder: (context, state) => const SearchTripsScreen()),
-      //GoRoute(path: AppRoutes.tripDetail, builder: (context, state) => const TripDetailScreen()),
-      //GoRoute(path: AppRoutes.selectSeats, builder: (context, state) => const SelectSeatsScreen()),
-      //GoRoute(path: AppRoutes.passengerInfo, builder: (context, state) => const PassengerInfoScreen()),
-      //GoRoute(path: AppRoutes.payment, builder: (context, state) => const PaymentScreen()),
-      GoRoute(path: AppRoutes.myTickets, builder: (context, state) => const MyTicketsScreen()),
-      //GoRoute(path: AppRoutes.ticketDetail, builder: (context, state) => const TicketDetailScreen()),
-      GoRoute(path: AppRoutes.createParcel, builder: (context, state) => const CreateParcelScreen()),
-      GoRoute(path: AppRoutes.trackParcel, builder: (context, state) => const TrackParcelScreen()),
-      GoRoute(path: AppRoutes.profile, builder: (context, state) => const ProfileScreen()),
-      GoRoute(path: AppRoutes.editProfile, builder: (context, state) => const EditProfileScreen()),
+      GoRoute(
+        path: AppRoutes.passengerDashboard,
+        name: 'passengerDashboard',
+        builder: (context, state) => const PassengerDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.passengerTripSearch,
+        name: 'passengerTripSearch',
+        builder: (context, state) => const TripSearchScreen(),
+      ),
+      GoRoute(
+        path: '/passenger/trips/:id',
+        name: 'passengerTripDetail',
+        builder: (context, state) {
+          final tripId = int.parse(state.pathParameters['id']!);
+          return TripDetailScreen(tripId: tripId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.passengerProfile,
+        name: 'passengerProfile',
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.passengerMyTickets,
+        name: 'passengerMyTickets',
+        builder: (context, state) => const MyTicketsScreen(),
+      ),
+      GoRoute(
+        path: '/passenger/ticket-detail/:id',
+        name: 'passengerTicketDetail',
+        builder: (context, state) {
+          final ticketId = int.parse(state.pathParameters['id']!);
+          return TicketDetailScreen(ticketId: ticketId);
+        },
+      ),
+      GoRoute(
+        path: '/passenger/seat-selection/:tripId',
+        name: 'passengerSeatSelection',
+        builder: (context, state) {
+          final tripId = int.parse(state.pathParameters['tripId']!);
+          return SeatSelectionScreen(tripId: tripId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.passengerParcelTracking,
+        name: 'passengerParcelTracking',
+        builder: (context, state) => const ParcelTrackingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.passengerBookingSuccess,
+        name: 'passengerBookingSuccess',
+        builder: (context, state) {
+          final ticketId = state.extra as int;
+          return BookingSuccessScreen(ticketId: ticketId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.passengerBookingConfirm,
+        name: 'passengerBookingConfirm',
+        builder: (context, state) {
+          final tripId = state.extra as int;
+          return BookingConfirmationScreen(tripId: tripId);
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.editProfile,
+        name: 'editProfile',
+        builder: (context, state) {
+          final userId = state.extra as int?;
+          return UserFormScreen(
+            isEdit: true,
+            userId: userId,
+            showPasswordField: false,
+          );
+        },
+      ),
 
       // ==================== DISPATCHER ====================
-      GoRoute(path: AppRoutes.dispatcherDashboard, builder: (context, state) => const DispatcherDashboardScreen()),
-      GoRoute(path: AppRoutes.dispatcherTrips, builder: (context, state) => const DispatcherTripListScreen()),
-      GoRoute(path: AppRoutes.dispatcherTripCreate, builder: (context, state) => const TripFormScreen()),
-      GoRoute(path: AppRoutes.dispatcherTripEdit, builder: (context, state) => const TripFormScreen(isEdit: true)),
-      GoRoute(path: AppRoutes.dispatcherAssignments, builder: (context, state) => const AssignmentListScreen()),
-      GoRoute(path: AppRoutes.dispatcherAssignmentCreate, builder: (context, state) => const AssignmentCreateScreen()),
-      GoRoute(path: AppRoutes.dispatcherOverbooking, builder: (context, state) => const OverbookingListScreen()),
-      GoRoute(path: AppRoutes.dispatcherBuses, builder: (context, state) => const BusListScreen()),
-      GoRoute(path: AppRoutes.dispatcherIncidents, builder: (context, state) => const IncidentListScreen()),
+      GoRoute(
+        path: AppRoutes.dispatcherDashboard,
+        name: 'dispatcherDashboard',
+        builder: (context, state) => const DispatcherDashboardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.dispatcherTrips,
+        name: 'dispatcherTrips',
+        builder: (context, state) => const DispatcherTripListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.dispatcherTripCreate,
+        name: 'dispatcherTripCreate',
+        builder: (context, state) => const TripFormScreenss(),
+      ),
+      GoRoute(
+        path: AppRoutes.dispatcherAssignments,
+        name: 'dispatcherAssignments',
+        builder: (context, state) => const AssignmentsListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.dispatcherAssignmentCreate,
+        name: 'dispatcherAssignmentCreate',
+        builder: (context, state) => const AssignmentFormScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.dispatcherOverbooking,
+        name: 'dispatcherOverbooking',
+        builder: (context, state) => const OverbookingListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.dispatcherBuses,
+        name: 'dispatcherBuses',
+        builder: (context, state) => const BusListScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.dispatcherIncidents,
+        name: 'dispatcherIncidents',
+        builder: (context, state) => const IncidentsListScreen(),
+      ),
     ],
   );
 
@@ -126,11 +412,9 @@ class AppRouter {
       case UserRole.DISPATCHER:
         return AppRoutes.dispatcherDashboard;
       case UserRole.CLERK:
-        return AppRoutes.home;
       case UserRole.DRIVER:
-        return AppRoutes.home;
       case UserRole.PASSENGER:
-        return AppRoutes.home;
+        return AppRoutes.passengerDashboard;
     }
   }
 }

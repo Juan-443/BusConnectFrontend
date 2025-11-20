@@ -1,330 +1,386 @@
-import 'package:bus_connect/data/models/incident_model/incident_model.dart';
-import 'package:bus_connect/presentation/providers/user_provider.dart';
+import 'package:bus_connect/core/constants/enums/incident_type.dart';
+import 'package:bus_connect/core/constants/enums/entity_type.dart';
+import 'package:bus_connect/presentation/providers/auth_provider.dart';
+import 'package:bus_connect/presentation/providers/incident_provider.dart';
+import 'package:bus_connect/presentation/providers/current_user_provider.dart'; // ✅ NUEVO
+import 'package:bus_connect/presentation/screens/admin/incidents/incident_card.dart';
+import 'package:bus_connect/presentation/screens/admin/incidents/incident_from_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/constants/enums/entity_type.dart';
-import '../../../../core/constants/enums/incident_type.dart';
-import '../../../widgets/common/loading_indicator.dart';
-import '../../../widgets/common/error_widget.dart' as custom;
-import '../../../../core/utils/date_formatter.dart';
-import '../../../providers/incident_provider.dart';
 
-class IncidentListScreen extends ConsumerStatefulWidget {
-  const IncidentListScreen({Key? key}) : super(key: key);
+class IncidentsListScreen extends ConsumerStatefulWidget {
+  const IncidentsListScreen({super.key});
 
   @override
-  ConsumerState<IncidentListScreen> createState() => _IncidentListScreenState();
+  ConsumerState<IncidentsListScreen> createState() =>
+      _IncidentsListScreenState();
 }
 
-class _IncidentListScreenState extends ConsumerState<IncidentListScreen> {
-  String _searchQuery = '';
+class _IncidentsListScreenState extends ConsumerState<IncidentsListScreen> {
+  IncidentType? _filterType;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.microtask(() {
       ref.read(incidentProvider.notifier).fetchAllIncidents();
+      ref.read(currentUserProvider.notifier).refresh();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = ref.watch(incidentProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Incidentes'),
         actions: [
-          IconButton(
+          PopupMenuButton<IncidentType?>(
             icon: const Icon(Icons.filter_list),
-            onPressed: _showFilterDialog,
+            onSelected: (type) {
+              setState(() => _filterType = type);
+            },
+            itemBuilder: (ctx) => [
+              const PopupMenuItem(
+                value: null,
+                child: Text('Todos'),
+              ),
+              ...IncidentType.values.map((type) {
+                return PopupMenuItem(
+                  value: type,
+                  child: Text(type.name),
+                );
+              }),
+            ],
           ),
           IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: _showCreateIncidentDialog,
+            icon: const Icon(Icons.refresh),
+            onPressed: () =>
+                ref.read(incidentProvider.notifier).fetchAllIncidents(),
           ),
         ],
       ),
-      body: Column(
-        children: [
-          _buildSearchBar(),
-          _buildFilterChips(),
-          _buildStatistics(),
-          Expanded(child: _buildIncidentList()),
-        ],
+      body: state.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : state.error != null
+          ? _buildError(state.error!)
+          : _buildIncidentsList(state.incidents),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _showCreateIncidentDialog,
+        icon: const Icon(Icons.add),
+        label: const Text('Reportar Incidente'),
       ),
     );
   }
 
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Buscar incidentes...',
-          prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          filled: true,
-        ),
-        onChanged: (value) {
-          setState(() => _searchQuery = value);
-        },
-      ),
-    );
-  }
-
-  Widget _buildFilterChips() {
-    final state = ref.watch(incidentProvider);
-    final provider = ref.read(incidentProvider.notifier);
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          if (state.filterType != null)
-            Chip(
-              label: Text('Tipo: ${state.filterType!.name}'),
-              onDeleted: () => provider.setTypeFilter(null),
-            ),
-          if (state.filterEntityType != null) ...[
-            const SizedBox(width: 8),
-            Chip(
-              label: Text('Entidad: ${state.filterEntityType!.name}'),
-              onDeleted: () => provider.setEntityTypeFilter(null),
-            ),
-          ],
-          if (state.filterType != null || state.filterEntityType != null) ...[
-            const SizedBox(width: 8),
-            ActionChip(
-              label: const Text('Limpiar filtros'),
-              onPressed: () => provider.clearFilters(),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatistics() {
-    final state = ref.watch(incidentProvider);
-    final byType = state.incidentsByType;
-
-    if (byType.isEmpty) return const SizedBox.shrink();
-
-    return Container(
-      padding: const EdgeInsets.all(16),
+  Widget _buildError(String error) {
+    return Center(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Resumen por tipo',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(
+            'Error al cargar incidentes',
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: byType.entries.map((entry) {
-              return Chip(
-                avatar: CircleAvatar(
-                  backgroundColor: _getIncidentColor(entry.key),
-                  child: Text(
-                    '${entry.value.length}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-                label: Text(entry.key),
-              );
-            }).toList(),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () =>
+                ref.read(incidentProvider.notifier).fetchAllIncidents(),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Reintentar'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildIncidentList() {
-    final state = ref.watch(incidentProvider);
-    final provider = ref.read(incidentProvider.notifier);
+  Widget _buildIncidentsList(List incidents) {
+    final filteredIncidents = _filterType == null
+        ? incidents
+        : incidents.where((i) => i.type == _filterType!.name).toList();
 
-    if (state.isLoading) return const LoadingIndicator();
-
-    if (state.error != null) {
-      return custom.ErrorDisplay(
-        message: state.error!,
-        onRetry: () => provider.fetchAllIncidents(),
+    if (filteredIncidents.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
+            SizedBox(height: 16),
+            Text('No hay incidentes registrados'),
+          ],
+        ),
       );
     }
 
-    var incidents = state.filteredIncidents;
-
-    if (_searchQuery.isNotEmpty) {
-      incidents = incidents.where((incident) {
-        return incident.type.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            (incident.note?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false) ||
-            (incident.reportedByName?.toLowerCase().contains(_searchQuery.toLowerCase()) ?? false);
-      }).toList();
-    }
-
-    if (incidents.isEmpty) {
-      return const Center(child: Text('No se encontraron incidentes'));
-    }
-
     return RefreshIndicator(
-      onRefresh: () => provider.fetchAllIncidents(),
+      onRefresh: () => ref.read(incidentProvider.notifier).fetchAllIncidents(),
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
-        itemCount: incidents.length,
+        itemCount: filteredIncidents.length,
         itemBuilder: (context, index) {
-          final incident = incidents[index];
-          return Card(
-            margin: const EdgeInsets.only(bottom: 12),
-            child: ExpansionTile(
-              leading: CircleAvatar(
-                backgroundColor: _getIncidentColor(incident.type.name),
-                child: Icon(
-                  _getIncidentIcon(incident.type.name),
-                  color: Colors.white,
-                ),
-              ),
-              title: Text(
-                _getIncidentTypeDisplayName(incident.type.name),
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 4),
-                  if (incident.note != null)
-                    Text(
-                      incident.note!,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(Icons.person, size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        incident.reportedByName ?? 'Desconocido',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                      const SizedBox(width: 16),
-                      Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 4),
-                      Text(
-                        DateFormatter.formatRelativeTime(incident.createdAt),
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              trailing: PopupMenuButton(
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Row(
-                      children: [
-                        Icon(Icons.edit),
-                        SizedBox(width: 8),
-                        Text('Editar'),
-                      ],
-                    ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'delete',
-                    child: Row(
-                      children: [
-                        Icon(Icons.delete, color: Colors.red),
-                        SizedBox(width: 8),
-                        Text('Eliminar', style: TextStyle(color: Colors.red)),
-                      ],
-                    ),
-                  ),
-                ],
-                onSelected: (value) => _handleMenuAction(value, incident, provider),
-              ),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildInfoRow('Tipo de entidad:', incident.entityType.name),
-                      const SizedBox(height: 8),
-                      _buildInfoRow('ID de entidad:', incident.entityId.toString()),
-                      const SizedBox(height: 8),
-                      _buildInfoRow('Reportado por:', incident.reportedByName ?? '--'),
-                      const SizedBox(height: 8),
-                      _buildInfoRow(
-                        'Fecha:',
-                        DateFormatter.formatDateTime(incident.createdAt),
-                      ),
-                      if (incident.note != null) ...[
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Descripción:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(incident.note!),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          final incident = filteredIncidents[index];
+          return IncidentCard(
+            incident: incident,
+            onTap: () => _showIncidentDetails(incident),
+            onDelete: () => _confirmDelete(incident.id),
           );
         },
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  void _showCreateIncidentDialog() async {
+    final authState = ref.read(authProvider);
+
+    if (!authState.isAuthenticated || authState.user?.id == null) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: Usuario no autenticado'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final userId = authState.user!.id;
+
+    if (!mounted) return;
+    final selectedEntityType = await showDialog<EntityType>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Seleccionar Entidad'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.directions_bus, color: Colors.blue),
+              title: const Text('Viaje'),
+              subtitle: const Text('Reportar incidente de un viaje'),
+              onTap: () => Navigator.pop(ctx, EntityType.TRIP),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.confirmation_number, color: Colors.green),
+              title: const Text('Ticket'),
+              subtitle: const Text('Reportar incidente de un ticket'),
+              onTap: () => Navigator.pop(ctx, EntityType.TICKET),
+            ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.inventory_2, color: Colors.orange),
+              title: const Text('Encomienda'),
+              subtitle: const Text('Reportar incidente de una encomienda'),
+              onTap: () => Navigator.pop(ctx, EntityType.PARCEL),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancelar'),
+          ),
+        ],
+      ),
+    );
+
+    if (selectedEntityType == null || !mounted) return;
+
+    final result = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => IncidentFormScreen(
+          entityType: selectedEntityType,
+          reportedBy: userId,
+        ),
+      ),
+    );
+
+    if (result == true && mounted) {
+      ref.read(incidentProvider.notifier).fetchAllIncidents();
+    }
+  }
+
+  void _showIncidentDetails(dynamic incident) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.4,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) => Container(
+          padding: const EdgeInsets.all(24),
+          child: ListView(
+            controller: scrollController,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    _getIncidentIcon(incident.type),
+                    size: 32,
+                    color: _getIncidentColor(incident.type),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                      incident.type,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const Divider(height: 32),
+
+              if (incident.note != null) ...[
+                const Text(
+                  'Descripción:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  incident.note,
+                  style: const TextStyle(fontSize: 14),
+                ),
+                const Divider(height: 32),
+              ],
+
+              _buildDetailItem(
+                icon: Icons.category,
+                label: 'Entidad',
+                value: '${incident.entityType} #${incident.entityId}',
+              ),
+              const SizedBox(height: 16),
+
+              _buildDetailItem(
+                icon: Icons.person,
+                label: 'Reportado por',
+                value: incident.reportedByName ?? 'N/A',
+              ),
+              const SizedBox(height: 16),
+
+              _buildDetailItem(
+                icon: Icons.access_time,
+                label: 'Fecha',
+                value: _formatDateTime(incident.createdAt),
+              ),
+
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _confirmDelete(incident.id);
+                },
+                icon: const Icon(Icons.delete),
+                label: const Text('Eliminar Incidente'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(width: 8),
-        Expanded(child: Text(value)),
+        Icon(icon, size: 20, color: Colors.blue),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
 
-  Color _getIncidentColor(String type) {
-    switch (type) {
-      case 'SECURITY':
-        return Colors.red;
-      case 'VEHICLE':
-        return Colors.orange;
-      case 'DELIVERY_FAIL':
-        return Colors.amber;
-      case 'OVERBOOK':
-        return Colors.purple;
-      case 'PASSENGER_COMPLAINT':
-        return Colors.blue;
-      default:
-        return Colors.grey;
+  Future<void> _confirmDelete(int id) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Confirmar eliminación'),
+        content: const Text('¿Eliminar este incidente?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && mounted) {
+      final success = await ref.read(incidentProvider.notifier).deleteIncident(id);
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Incidente eliminado exitosamente')),
+        );
+      }
     }
   }
 
   IconData _getIncidentIcon(String type) {
-    switch (type) {
+    switch (type.toUpperCase()) {
       case 'SECURITY':
         return Icons.security;
-      case 'VEHICLE':
-        return Icons.build;
       case 'DELIVERY_FAIL':
         return Icons.local_shipping;
       case 'OVERBOOK':
-        return Icons.people;
+        return Icons.airline_seat_recline_extra;
+      case 'VEHICLE':
+        return Icons.build;
       case 'PASSENGER_COMPLAINT':
         return Icons.report_problem;
       default:
@@ -332,323 +388,30 @@ class _IncidentListScreenState extends ConsumerState<IncidentListScreen> {
     }
   }
 
-  String _getIncidentTypeDisplayName(String type) {
-    switch (type) {
+  Color _getIncidentColor(String type) {
+    switch (type.toUpperCase()) {
       case 'SECURITY':
-        return 'Seguridad';
-      case 'VEHICLE':
-        return 'Vehículo';
+        return Colors.red;
       case 'DELIVERY_FAIL':
-        return 'Fallo en entrega';
+        return Colors.orange;
       case 'OVERBOOK':
-        return 'Sobreventa';
+        return Colors.purple;
+      case 'VEHICLE':
+        return Colors.blue;
       case 'PASSENGER_COMPLAINT':
-        return 'Queja de pasajero';
-      case 'OTHER':
-        return 'Otro';
+        return Colors.amber;
       default:
-        return type;
+        return Colors.grey;
     }
   }
 
-  void _handleMenuAction(dynamic value, IncidentResponse incident, IncidentNotifier provider) {
-    switch (value) {
-      case 'edit':
-        _showEditIncidentDialog(incident);
-        break;
-      case 'delete':
-        _confirmDelete(incident);
-        break;
+  String _formatDateTime(String? dateTimeStr) {
+    if (dateTimeStr == null) return 'N/A';
+    try {
+      final dateTime = DateTime.parse(dateTimeStr);
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    } catch (e) {
+      return dateTimeStr;
     }
-  }
-
-  // ==================== DIALOGS ====================
-
-  void _showCreateIncidentDialog() {
-    final formKey = GlobalKey<FormState>();
-    IncidentType selectedType = IncidentType.OTHER;
-    EntityType selectedEntityType = EntityType.TRIP;
-    final entityIdController = TextEditingController();
-    final noteController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Reportar Incidente'),
-          content: Form(
-            key: formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DropdownButtonFormField<IncidentType>(
-                    initialValue: selectedType,
-                    decoration: const InputDecoration(
-                      labelText: 'Tipo de incidente',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: IncidentType.values.map((type) {
-                      return DropdownMenuItem(
-                        value: type,
-                        child: Text(_getIncidentTypeDisplayName(type.name.toUpperCase())),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() => selectedType = value!);
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<EntityType>(
-                    initialValue: selectedEntityType,
-                    decoration: const InputDecoration(
-                      labelText: 'Tipo de entidad',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: EntityType.values.map((type) {
-                      return DropdownMenuItem(
-                        value: type,
-                        child: Text(type.name.toUpperCase()),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() => selectedEntityType = value!);
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: entityIdController,
-                    decoration: const InputDecoration(
-                      labelText: 'ID de entidad',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'El ID es requerido';
-                      }
-                      if (int.tryParse(value) == null) {
-                        return 'ID inválido';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: noteController,
-                    decoration: const InputDecoration(
-                      labelText: 'Descripción',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 3,
-                  ),
-                ],
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () async {
-                if (!formKey.currentState!.validate()) return;
-
-                final provider = ref.read(incidentProvider.notifier);
-                final currentUser = ref.read(userProvider).currentUser;
-
-                if (currentUser == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Usuario no autenticado')),
-                  );
-                  return;
-                }
-
-                final request = IncidentCreateRequest(
-                  entityType: selectedEntityType,
-                  entityId: int.parse(entityIdController.text),
-                  type: selectedType,
-                  note: noteController.text.isEmpty ? null : noteController.text,
-                  reportedBy: currentUser.id,
-                );
-
-                final success = await provider.createIncident(request);
-                final state = ref.watch(incidentProvider);
-
-                if (!mounted) return;
-
-                Navigator.pop(context);
-
-                if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Incidente reportado')),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.error ?? 'Error al reportar'),
-                    ),
-                  );
-                }
-              },
-              child: const Text('Reportar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showFilterDialog() {
-    IncidentType? selectedType;
-    EntityType? selectedEntityType;
-
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Filtros'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<IncidentType>(
-                initialValue: selectedType,
-                decoration: const InputDecoration(
-                  labelText: 'Tipo de incidente',
-                  border: OutlineInputBorder(),
-                ),
-                items: [
-                  const DropdownMenuItem(value: null, child: Text('Todos')),
-                  ...IncidentType.values.map((type) {
-                    return DropdownMenuItem(
-                      value: type,
-                      child: Text(_getIncidentTypeDisplayName(type.name.toUpperCase())),
-                    );
-                  }),
-                ],
-                onChanged: (value) => setState(() => selectedType = value),
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<EntityType>(
-                initialValue: selectedEntityType,
-                decoration: const InputDecoration(
-                  labelText: 'Tipo de entidad',
-                  border: OutlineInputBorder(),
-                ),
-                items: [
-                  const DropdownMenuItem(value: null, child: Text('Todas')),
-                  ...EntityType.values.map((type) {
-                    return DropdownMenuItem(
-                      value: type,
-                      child: Text(type.name.toUpperCase()),
-                    );
-                  }),
-                ],
-                onChanged: (value) => setState(() => selectedEntityType = value),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                ref.read(incidentProvider.notifier).clearFilters();
-                Navigator.pop(context);
-              },
-              child: const Text('Limpiar'),
-            ),
-            TextButton(
-              onPressed: () {
-                final provider = ref.read(incidentProvider.notifier);
-                provider.setTypeFilter(selectedType);
-                provider.setEntityTypeFilter(selectedEntityType);
-                Navigator.pop(context);
-              },
-              child: const Text('Aplicar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _confirmDelete(incident) async {
-    final provider = ref.read(incidentProvider.notifier);
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Confirmar eliminación'),
-        content: const Text('¿Estás seguro de eliminar este incidente?'),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final success = await provider.deleteIncident(incident.id);
-              final state = ref.watch(incidentProvider);
-              if (!mounted) return;
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Incidente eliminado')),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.error ?? 'Error al eliminar')),
-                );
-              }
-            },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showEditIncidentDialog(incident) {
-    final formKey = GlobalKey<FormState>();
-    final noteController = TextEditingController(text: incident.note);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Editar Incidente'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: noteController,
-            decoration: const InputDecoration(
-              labelText: 'Descripción',
-              border: OutlineInputBorder(),
-            ),
-            maxLines: 3,
-            validator: (value) => value == null || value.isEmpty ? 'La descripción es requerida' : null,
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          TextButton(
-            onPressed: () async {
-              if (!formKey.currentState!.validate()) return;
-              final provider = ref.read(incidentProvider.notifier);
-              final request = IncidentUpdateRequest(note: noteController.text);
-              final success = await provider.updateIncident(incident.id, request);
-              final state = ref.watch(incidentProvider);
-              if (!mounted) return;
-              Navigator.pop(context);
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Incidente actualizado')),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.error ?? 'Error al actualizar')),
-                );
-              }
-            },
-            child: const Text('Guardar'),
-          ),
-        ],
-      ),
-    );
   }
 }

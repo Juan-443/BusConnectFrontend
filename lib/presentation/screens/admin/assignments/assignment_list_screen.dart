@@ -1,351 +1,362 @@
-import 'package:bus_connect/data/models/assignment_model/assignment_model.dart';
+import 'package:bus_connect/presentation/providers/assignment_provider.dart';
+import 'package:bus_connect/presentation/widgets/assignment_card/assignment_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../providers/assignment_provider.dart';
-import '../../../widgets/common/loading_indicator.dart';
-import '../../../widgets/common/error_widget.dart' as custom;
-import '../../../../core/utils/date_formatter.dart';
+import 'package:go_router/go_router.dart';
 
-class AssignmentListScreen extends ConsumerStatefulWidget {
-  const AssignmentListScreen({Key? key}) : super(key: key);
+class AssignmentsListScreen extends ConsumerStatefulWidget {
+  const AssignmentsListScreen({super.key});
 
   @override
-  ConsumerState<AssignmentListScreen> createState() => _AssignmentListScreenState();
+  ConsumerState<AssignmentsListScreen> createState() => _AssignmentsListScreenState();
 }
 
-class _AssignmentListScreenState extends ConsumerState<AssignmentListScreen> {
-  String _searchQuery = '';
-  bool _showOnlyPending = false;
+class _AssignmentsListScreenState extends ConsumerState<AssignmentsListScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    // Llama al fetch después de construir el widget
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(assignmentProvider.notifier).fetchAllAssignments();
-    });
+    _tabController = TabController(length: 2, vsync: this);
+    Future.microtask(
+          () => ref.read(assignmentProvider.notifier).fetchAllAssignments(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(assignmentProvider);
-    final notifier = ref.read(assignmentProvider.notifier);
-
-    var assignments = _showOnlyPending
-        ? state.assignments.where((a) => !a.checklistOk).toList()
-        : state.assignments;
-
-    // Filtro de búsqueda
-    if (_searchQuery.isNotEmpty) {
-      assignments = assignments.where((assignment) {
-        return assignment.driverName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            assignment.tripInfo.toLowerCase().contains(_searchQuery.toLowerCase());
-      }).toList();
-    }
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Asignaciones'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.list), text: 'Todas'),
+            Tab(icon: Icon(Icons.today), text: 'Hoy'),
+          ],
+        ),
         actions: [
           IconButton(
-            icon: Icon(_showOnlyPending ? Icons.filter_list : Icons.filter_list_off),
-            onPressed: () => setState(() => _showOnlyPending = !_showOnlyPending),
-          ),
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => Navigator.pushNamed(context, '/admin/assignments/create'),
+            icon: const Icon(Icons.refresh),
+            onPressed: () =>
+                ref.read(assignmentProvider.notifier).fetchAllAssignments(),
           ),
         ],
       ),
-      body: Column(
+      body: state.isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : state.error != null
+          ? _buildError(state.error!)
+          : TabBarView(
+        controller: _tabController,
         children: [
-          _buildSearchBar(),
-          _buildFilterChips(),
-          Expanded(
-            child: _buildAssignmentList(state, notifier, assignments),
+          _buildAssignmentsList(state.assignments, 'all'),
+          _buildAssignmentsList(_filterTodayAssignments(state.assignments), 'today'),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/admin/assignments/create'),
+        icon: const Icon(Icons.add),
+        label: const Text('Nueva Asignación'),
+      ),
+    );
+  }
+
+  Widget _buildError(String error) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error_outline, size: 64, color: Colors.red),
+          const SizedBox(height: 16),
+          Text(
+            'Error al cargar asignaciones',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            error,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () =>
+                ref.read(assignmentProvider.notifier).fetchAllAssignments(),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Reintentar'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: 'Buscar por conductor, viaje...',
-          prefixIcon: const Icon(Icons.search),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          filled: true,
+  Widget _buildAssignmentsList(List assignments, String category) {
+    if (assignments.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              category == 'today'
+                  ? Icons.event_busy
+                  : Icons.assignment_outlined,
+              size: 64,
+              color: Colors.grey,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              category == 'today'
+                  ? 'No hay asignaciones para hoy'
+                  : 'No hay asignaciones registradas',
+            ),
+          ],
         ),
-        onChanged: (value) => setState(() => _searchQuery = value),
-      ),
-    );
-  }
-
-  Widget _buildFilterChips() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          FilterChip(
-            label: const Text('Solo pendientes'),
-            selected: _showOnlyPending,
-            onSelected: (selected) => setState(() => _showOnlyPending = selected),
-          ),
-          const SizedBox(width: 8),
-          ActionChip(
-            avatar: const Icon(Icons.calendar_today, size: 18),
-            label: const Text('Por fecha'),
-            onPressed: _showDatePicker,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAssignmentList(
-      AssignmentState state, AssignmentNotifier notifier, List<AssignmentResponse> assignments) {
-    if (state.isLoading) return const LoadingIndicator();
-
-    if (state.error != null) {
-      return custom.ErrorDisplay(
-        message: state.error!,
-        onRetry: () => notifier.fetchAllAssignments(),
       );
     }
 
-    if (assignments.isEmpty) {
-      return const Center(child: Text('No se encontraron asignaciones'));
-    }
-
     return RefreshIndicator(
-      onRefresh: () => notifier.fetchAllAssignments(),
+      onRefresh: () => ref.read(assignmentProvider.notifier).fetchAllAssignments(),
       child: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: assignments.length,
         itemBuilder: (context, index) {
           final assignment = assignments[index];
-          return _buildAssignmentCard(assignment, notifier);
+          return AssignmentCard(
+            assignment: assignment,
+            onTap: () => _showAssignmentDetails(assignment),
+            onDelete: () => _confirmDelete(assignment.id, assignment.tripInfo),
+            onApproveChecklist: assignment.checklistOk
+                ? null
+                : () => _approveChecklist(assignment.id),
+          );
         },
       ),
     );
   }
 
-  Widget _buildAssignmentCard(AssignmentResponse assignment, AssignmentNotifier notifier) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      child: ExpansionTile(
-        leading: CircleAvatar(
-          backgroundColor: _getStatusColor(assignment.checklistOk),
-          child: Icon(
-            assignment.checklistOk ? Icons.check : Icons.pending,
-            color: Colors.white,
-          ),
-        ),
-        title: Text(assignment.driverName, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            Text(assignment.tripInfo),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(Icons.calendar_today, size: 14, color: Colors.grey[600]),
-                const SizedBox(width: 4),
-                Text(
-                  assignment.tripDateFormatted,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
-                const SizedBox(width: 16),
-                _buildStatusBadge(assignment.tripStatus),
-              ],
-            ),
-          ],
-        ),
-        trailing: PopupMenuButton(
-          itemBuilder: (context) => [
-            if (!assignment.checklistOk)
-              const PopupMenuItem(
-                value: 'approve',
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.green),
-                    SizedBox(width: 8),
-                    Text('Aprobar checklist'),
-                  ],
-                ),
-              ),
-            const PopupMenuItem(
-              value: 'edit',
-              child: Row(
+  List _filterTodayAssignments(List assignments) {
+    final today = DateTime.now();
+    return assignments.where((assignment) {
+      try {
+        final tripDate = DateTime.parse(assignment.tripDate);
+        return tripDate.year == today.year &&
+            tripDate.month == today.month &&
+            tripDate.day == today.day;
+      } catch (e) {
+        return false;
+      }
+    }).toList();
+  }
+
+  void _showAssignmentDetails(dynamic assignment) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (context, scrollController) => Container(
+          padding: const EdgeInsets.all(24),
+          child: ListView(
+            controller: scrollController,
+            children: [
+              Row(
                 children: [
-                  Icon(Icons.edit),
-                  SizedBox(width: 8),
-                  Text('Editar'),
+                  Expanded(
+                    child: Text(
+                      'Detalles de Asignación',
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
                 ],
               ),
-            ),
-            const PopupMenuItem(
-              value: 'delete',
-              child: Row(
-                children: [
-                  Icon(Icons.delete, color: Colors.red),
-                  SizedBox(width: 8),
-                  Text('Eliminar', style: TextStyle(color: Colors.red)),
-                ],
+              const SizedBox(height: 24),
+
+              _buildDetailItem(
+                icon: Icons.route,
+                label: 'Viaje',
+                value: assignment.tripInfo ?? 'N/A',
               ),
-            ),
-          ],
-          onSelected: (value) => _handleMenuAction(value, assignment, notifier),
-        ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildInfoRow('Ruta:', assignment.routeInfo),
-                const SizedBox(height: 8),
-                _buildInfoRow('Hora salida:', assignment.tripDepartureTimeFormatted),
-                const SizedBox(height: 8),
-                _buildInfoRow('Despachador:', assignment.dispatcherName),
-                const SizedBox(height: 8),
-                _buildInfoRow('Asignado:',
-                    DateFormatter.formatDate(DateTime.parse(assignment.tripDate))),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Text('Checklist: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Icon(
-                      assignment.checklistOk ? Icons.check_circle : Icons.cancel,
-                      color: assignment.checklistOk ? Colors.green : Colors.orange,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      assignment.checklistOk ? 'Aprobado' : 'Pendiente',
-                      style: TextStyle(
-                        color: assignment.checklistOk ? Colors.green : Colors.orange,
-                      ),
-                    ),
-                  ],
+              const Divider(height: 32),
+
+              _buildDetailItem(
+                icon: Icons.person,
+                label: 'Conductor',
+                value: assignment.driverName ?? 'N/A',
+              ),
+              const Divider(height: 32),
+
+              _buildDetailItem(
+                icon: Icons.assignment_ind,
+                label: 'Despachador',
+                value: assignment.dispatcherName ?? 'N/A',
+              ),
+              const Divider(height: 32),
+
+              _buildDetailItem(
+                icon: Icons.calendar_today,
+                label: 'Fecha del viaje',
+                value: assignment.tripDate ?? 'N/A',
+              ),
+              const Divider(height: 32),
+
+              _buildDetailItem(
+                icon: Icons.access_time,
+                label: 'Hora de salida',
+                value: assignment.tripDepartureTime != null
+                    ? _formatDateTime(assignment.tripDepartureTime)
+                    : 'N/A',
+              ),
+              const Divider(height: 32),
+
+              _buildDetailItem(
+                icon: assignment.checklistOk
+                    ? Icons.check_circle
+                    : Icons.pending,
+                label: 'Checklist',
+                value: assignment.checklistOk ? 'Aprobado' : 'Pendiente',
+              ),
+
+              if (!assignment.checklistOk) ...[
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _approveChecklist(assignment.id);
+                    },
+                    icon: const Icon(Icons.check_circle),
+                    label: const Text('Aprobar Checklist'),
+                  ),
                 ),
               ],
-            ),
+
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _confirmDelete(assignment.id, assignment.tripInfo);
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Eliminar Asignación'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
+  Widget _buildDetailItem({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(width: 8),
-        Expanded(child: Text(value)),
+        Icon(icon, size: 24, color: Colors.blue),
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildStatusBadge(String status) {
-    final color = _getTripStatusColor(status);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        status,
-        style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Color _getStatusColor(bool checklistOk) => checklistOk ? Colors.green : Colors.orange;
-
-  Color _getTripStatusColor(String status) {
-    switch (status) {
-      case 'SCHEDULED':
-        return Colors.blue;
-      case 'BOARDING':
-        return Colors.orange;
-      case 'DEPARTED':
-        return Colors.purple;
-      case 'ARRIVED':
-        return Colors.green;
-      case 'CANCELLED':
-        return Colors.red;
-      default:
-        return Colors.grey;
+  String _formatDateTime(String? dateTimeStr) {
+    if (dateTimeStr == null) return 'N/A';
+    try {
+      final dateTime = DateTime.parse(dateTimeStr);
+      return '${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}';
+    } catch (e) {
+      return dateTimeStr;
     }
   }
 
-  void _handleMenuAction(dynamic value, AssignmentResponse assignment, AssignmentNotifier notifier) {
-    switch (value) {
-      case 'approve':
-        _approveChecklist(assignment, notifier);
-        break;
-      case 'edit':
-        notifier.clearSelectedAssignment();
-        notifier.fetchAssignmentById(assignment.id);
-        Navigator.pushNamed(context, '/admin/assignments/edit');
-        break;
-      case 'delete':
-        _confirmDelete(assignment, notifier);
-        break;
-    }
-  }
-
-  void _approveChecklist(AssignmentResponse assignment, AssignmentNotifier notifier) async {
-    final success = await notifier.approveChecklist(assignment.id);
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(success ? 'Checklist aprobado' : (notifier.state.error ?? 'Error'))),
-    );
-  }
-
-  void _confirmDelete(AssignmentResponse assignment, AssignmentNotifier notifier) {
-    showDialog(
+  Future<void> _confirmDelete(int id, String? tripInfo) async {
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Confirmar eliminación'),
-        content: const Text('¿Estás seguro de eliminar esta asignación?'),
+        content: Text(
+          '¿Eliminar la asignación para "${tripInfo ?? 'este viaje'}"?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
           TextButton(
-            onPressed: () async {
-              Navigator.pop(context);
-              final success = await notifier.deleteAssignment(assignment.id);
-              if (!mounted) return;
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(success ? 'Asignación eliminada' : (notifier.state.error ?? 'Error')),
-                ),
-              );
-            },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Eliminar'),
           ),
         ],
       ),
     );
+
+    if (confirmed == true && mounted) {
+      final success = await ref.read(assignmentProvider.notifier).deleteAssignment(id);
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Asignación eliminada exitosamente')),
+        );
+      }
+    }
   }
 
-  void _showDatePicker() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
-    );
-
-    if (picked != null && mounted) {
-      ref.read(assignmentProvider.notifier).setDateFilter(picked.toIso8601String().split('T')[0]);
+  Future<void> _approveChecklist(int id) async {
+    final success = await ref.read(assignmentProvider.notifier).approveChecklist(id);
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Checklist aprobado exitosamente')),
+      );
     }
   }
 }

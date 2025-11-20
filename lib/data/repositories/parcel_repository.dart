@@ -20,6 +20,17 @@ class ParcelRepository {
     }
   }
 
+  Future<Either<Failure, List<ParcelResponse>>> getParcelsByTrip(
+      int tripId,
+      ) async {
+    try {
+      final response = await _apiProvider.getParcelsByTrip(tripId);
+      return Right(response);
+    } on DioException catch (e) {
+      return Left(_handleError(e));
+    }
+  }
+
   Future<Either<Failure, List<ParcelResponse>>> getAllParcels() async {
     try {
       final response = await _apiProvider.getAllParcels();

@@ -123,7 +123,7 @@ class BusRepository {
       BusStatus status,
       ) async {
     try {
-      final result = await _apiProvider.changeBusStatus(id, status);
+      final result = await _apiProvider.changeBusStatus(id, status.toJson());
       return Right(result);
     } on DioException catch (e) {
       return Left(ServerFailure(_getErrorMessage(e)));

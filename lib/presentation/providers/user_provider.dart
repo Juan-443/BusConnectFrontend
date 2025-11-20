@@ -1,22 +1,9 @@
-import 'package:bus_connect/presentation/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../data/providers/user_api_provider.dart';
 import '../../data/repositories/user_repository.dart';
 import '../../data/models/user_model/user_model.dart';
 import '../../core/constants/enums/user_role.dart';
 import '../../core/constants/enums/user_status.dart';
-
-/// ==================== API PROVIDER ====================
-final userApiProvider = Provider<UserApiProvider>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return UserApiProvider(apiClient.dio);
-});
-
-/// ==================== REPOSITORY PROVIDER ====================
-final userRepositoryProvider = Provider<UserRepository>((ref) {
-  final apiProvider = ref.watch(userApiProvider);
-  return UserRepository(apiProvider);
-});
+import 'package:bus_connect/app.dart';
 
 /// ==================== STATE ====================
 class UserState {
@@ -29,6 +16,12 @@ class UserState {
   final UserRole? filterRole;
   final UserStatus? filterStatus;
 
+  final int currentPage;
+  final int pageSize;
+  final bool hasMorePages;
+  final bool isLoadingMore;
+  final List<UserResponse> _allUsers;
+
   const UserState({
     this.users = const [],
     this.selectedUser,
@@ -37,7 +30,12 @@ class UserState {
     this.error,
     this.filterRole,
     this.filterStatus,
-  });
+    this.currentPage = 1,
+    this.pageSize = 20,
+    this.hasMorePages = true,
+    this.isLoadingMore = false,
+    List<UserResponse> allUsers = const [],
+  }) : _allUsers = allUsers;
 
   UserState copyWith({
     List<UserResponse>? users,
@@ -45,32 +43,49 @@ class UserState {
     UserResponse? currentUser,
     bool? isLoading,
     String? error,
-    UserRole? filterRole,
-    UserStatus? filterStatus,
+    bool clearError = false,
+    bool clearCurrentUser = false,
+    Object? filterRole = _undefined,
+    Object? filterStatus = _undefined,
+    int? currentPage,
+    int? pageSize,
+    bool? hasMorePages,
+    bool? isLoadingMore,
+    List<UserResponse>? allUsers,
   }) {
     return UserState(
       users: users ?? this.users,
       selectedUser: selectedUser ?? this.selectedUser,
-      currentUser: currentUser ?? this.currentUser,
+      currentUser: clearCurrentUser ? null : (currentUser ?? this.currentUser),
       isLoading: isLoading ?? this.isLoading,
-      error: error,
-      filterRole: filterRole ?? this.filterRole,
-      filterStatus: filterStatus ?? this.filterStatus,
+      error: clearError ? null : (error ?? this.error),
+      filterRole: filterRole == _undefined
+          ? this.filterRole
+          : filterRole as UserRole?,
+      filterStatus: filterStatus == _undefined
+          ? this.filterStatus
+          : filterStatus as UserStatus?,
+      currentPage: currentPage ?? this.currentPage,
+      pageSize: pageSize ?? this.pageSize,
+      hasMorePages: hasMorePages ?? this.hasMorePages,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+      allUsers: allUsers ?? _allUsers,
     );
   }
 
   List<UserResponse> get filteredUsers {
     var filtered = users;
 
-    if (filterRole != null) {
-      filtered =
-          filtered.where((u) => u.role == filterRole!.name).toList();
-    }
-    if (filterStatus != null) {
-      filtered =
-          filtered.where((u) => u.status == filterStatus!.name).toList();
+    if (currentUser != null) {
+      filtered = filtered.where((u) => u.id != currentUser!.id).toList();
     }
 
+    if (filterRole != null) {
+      filtered = filtered.where((u) => u.role == filterRole!).toList();
+    }
+    if (filterStatus != null) {
+      filtered = filtered.where((u) => u.status == filterStatus!).toList();
+    }
     return filtered;
   }
 
@@ -80,20 +95,23 @@ class UserState {
 /// ==================== NOTIFIER ====================
 class UserNotifier extends StateNotifier<UserState> {
   final UserRepository _repository;
+  final Ref _ref;
 
-  UserNotifier(this._repository) : super(const UserState());
+  UserNotifier(this._repository, this._ref) : super(const UserState());
 
   // 🔹 Helper Methods
-  void _setLoading(bool value) =>
-      state = state.copyWith(isLoading: value);
+  void _setLoading(bool value) => state = state.copyWith(isLoading: value);
 
   void _setError(String message) =>
       state = state.copyWith(isLoading: false, error: message);
 
-  void _clearError() =>
-      state = state.copyWith(error: null);
+  void _clearError() => state = state.copyWith(clearError: true);
 
   // ==================== CURRENT USER ====================
+  Future<void> loadCurrentUser() async {
+    await fetchCurrentUser();
+  }
+
   Future<void> fetchCurrentUser() async {
     _setLoading(true);
     final result = await _repository.getMe();
@@ -103,7 +121,7 @@ class UserNotifier extends StateNotifier<UserState> {
           (user) => state = state.copyWith(
         currentUser: user,
         isLoading: false,
-        error: null,
+        clearError: true,
       ),
     );
   }
@@ -135,19 +153,89 @@ class UserNotifier extends StateNotifier<UserState> {
       },
           (_) {
         _clearError();
+        state = state.copyWith(isLoading: false);
         return true;
       },
     );
   }
 
   // ==================== FETCH USERS (ADMIN) ====================
-  Future<void> fetchAllUsers() async {
-    _setLoading(true);
+  Future<void> fetchAllUsers({bool isRefresh = false}) async {
+    if (isRefresh) {
+      state = state.copyWith(
+        isLoading: true,
+        currentPage: 1,
+        hasMorePages: true,
+        clearError: true,
+      );
+    } else {
+      _setLoading(true);
+    }
+
+    // Cargar usuario actual si no existe
+    if (state.currentUser == null) {
+      await loadCurrentUser();
+    }
+
     final result = await _repository.getAllUsers();
 
     result.fold(
           (failure) => _setError(failure.message),
-          (users) => state = state.copyWith(users: users, isLoading: false),
+          (allUsers) {
+        final usersWithoutCurrent = allUsers.where((user) {
+          return state.currentUser == null ||
+              user.id != state.currentUser!.id;
+        }).toList();
+
+        final paginatedUsers = usersWithoutCurrent
+            .take(state.pageSize)
+            .toList();
+
+        state = state.copyWith(
+          allUsers: usersWithoutCurrent,
+          users: paginatedUsers,
+          isLoading: false,
+          hasMorePages: usersWithoutCurrent.length > state.pageSize,
+          currentPage: 1,
+          clearError: true,
+        );
+      },
+    );
+  }
+
+  Future<void> loadMoreUsers() async {
+    if (state.isLoadingMore || !state.hasMorePages || state.isLoading) {
+      return;
+    }
+
+    state = state.copyWith(isLoadingMore: true);
+
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    final nextPage = state.currentPage + 1;
+    final startIndex = (nextPage - 1) * state.pageSize;
+    final endIndex = startIndex + state.pageSize;
+
+    if (startIndex >= state._allUsers.length) {
+      state = state.copyWith(
+        isLoadingMore: false,
+        hasMorePages: false,
+      );
+      return;
+    }
+
+    final newUsers = state._allUsers
+        .skip(startIndex)
+        .take(state.pageSize)
+        .toList();
+
+    final updatedUsers = [...state.users, ...newUsers];
+
+    state = state.copyWith(
+      users: updatedUsers,
+      currentPage: nextPage,
+      hasMorePages: endIndex < state._allUsers.length,
+      isLoadingMore: false,
     );
   }
 
@@ -170,7 +258,17 @@ class UserNotifier extends StateNotifier<UserState> {
 
     result.fold(
           (failure) => _setError(failure.message),
-          (users) => state = state.copyWith(users: users, isLoading: false),
+          (users) {
+        final filtered = users.where((u) {
+          return state.currentUser == null || u.id != state.currentUser!.id;
+        }).toList();
+
+        state = state.copyWith(
+          users: filtered,
+          allUsers: filtered,
+          isLoading: false,
+        );
+      },
     );
   }
 
@@ -181,7 +279,17 @@ class UserNotifier extends StateNotifier<UserState> {
 
     result.fold(
           (failure) => _setError(failure.message),
-          (users) => state = state.copyWith(users: users, isLoading: false),
+          (users) {
+        final filtered = users.where((u) {
+          return state.currentUser == null || u.id != state.currentUser!.id;
+        }).toList();
+
+        state = state.copyWith(
+          users: filtered,
+          allUsers: filtered,
+          isLoading: false,
+        );
+      },
     );
   }
 
@@ -191,7 +299,17 @@ class UserNotifier extends StateNotifier<UserState> {
 
     result.fold(
           (failure) => _setError(failure.message),
-          (users) => state = state.copyWith(users: users, isLoading: false),
+          (users) {
+        final filtered = users.where((u) {
+          return state.currentUser == null || u.id != state.currentUser!.id;
+        }).toList();
+
+        state = state.copyWith(
+          users: filtered,
+          allUsers: filtered,
+          isLoading: false,
+        );
+      },
     );
   }
 
@@ -206,10 +324,15 @@ class UserNotifier extends StateNotifier<UserState> {
         return false;
       },
           (user) {
-        state = state.copyWith(
-          users: [...state.users, user],
-          isLoading: false,
-        );
+        if (state.currentUser == null || user.id != state.currentUser!.id) {
+          state = state.copyWith(
+            users: [...state.users, user],
+            allUsers: [...state._allUsers, user],
+            isLoading: false,
+          );
+        } else {
+          state = state.copyWith(isLoading: false);
+        }
         return true;
       },
     );
@@ -229,8 +352,13 @@ class UserNotifier extends StateNotifier<UserState> {
           return u.id == id ? user : u;
         }).toList();
 
+        final updatedAllUsers = state._allUsers.map((u) {
+          return u.id == id ? user : u;
+        }).toList();
+
         state = state.copyWith(
           users: updatedUsers,
+          allUsers: updatedAllUsers,
           selectedUser:
           state.selectedUser?.id == id ? user : state.selectedUser,
           isLoading: false,
@@ -251,8 +379,11 @@ class UserNotifier extends StateNotifier<UserState> {
       },
           (_) {
         final updated = state.users.where((u) => u.id != id).toList();
+        final updatedAll = state._allUsers.where((u) => u.id != id).toList();
+
         state = state.copyWith(
           users: updated,
+          allUsers: updatedAll,
           selectedUser:
           state.selectedUser?.id == id ? null : state.selectedUser,
           isLoading: false,
@@ -276,8 +407,13 @@ class UserNotifier extends StateNotifier<UserState> {
           return u.id == id ? user : u;
         }).toList();
 
+        final updatedAllUsers = state._allUsers.map((u) {
+          return u.id == id ? user : u;
+        }).toList();
+
         state = state.copyWith(
           users: updatedUsers,
+          allUsers: updatedAllUsers,
           selectedUser:
           state.selectedUser?.id == id ? user : state.selectedUser,
           isLoading: false,
@@ -308,7 +444,10 @@ class UserNotifier extends StateNotifier<UserState> {
   }
 
   void clearFilters() {
-    state = state.copyWith(filterRole: null, filterStatus: null);
+    state = state.copyWith(
+      filterRole: null,
+      filterStatus: null,
+    );
   }
 
   // ==================== HELPERS ====================
@@ -319,10 +458,20 @@ class UserNotifier extends StateNotifier<UserState> {
   void selectUser(UserResponse user) {
     state = state.copyWith(selectedUser: user);
   }
+
+  void resetPagination() {
+    state = state.copyWith(
+      currentPage: 1,
+      hasMorePages: true,
+      users: state._allUsers.take(state.pageSize).toList(),
+    );
+  }
 }
+
+const _undefined = Object();
 
 /// ==================== PROVIDER ====================
 final userProvider = StateNotifierProvider<UserNotifier, UserState>((ref) {
   final repository = ref.watch(userRepositoryProvider);
-  return UserNotifier(repository);
+  return UserNotifier(repository, ref);
 });

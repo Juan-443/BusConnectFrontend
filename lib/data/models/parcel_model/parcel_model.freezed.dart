@@ -31,13 +31,11 @@ mixin _$ParcelModel {
   ParcelStatus get status => throw _privateConstructorUsedError;
   String? get proofPhotoUrl => throw _privateConstructorUsedError;
   String? get deliveryOtp => throw _privateConstructorUsedError;
-  String get createdAt => throw _privateConstructorUsedError;
+  DateTime? get createdAt => throw _privateConstructorUsedError;
   String? get deliveredAt => throw _privateConstructorUsedError;
   int get fromStopId => throw _privateConstructorUsedError;
   int get toStopId => throw _privateConstructorUsedError;
   int? get tripId => throw _privateConstructorUsedError;
-  StopModel? get fromStop => throw _privateConstructorUsedError;
-  StopModel? get toStop => throw _privateConstructorUsedError;
 
   /// Serializes this ParcelModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -67,17 +65,12 @@ abstract class $ParcelModelCopyWith<$Res> {
     ParcelStatus status,
     String? proofPhotoUrl,
     String? deliveryOtp,
-    String createdAt,
+    DateTime? createdAt,
     String? deliveredAt,
     int fromStopId,
     int toStopId,
     int? tripId,
-    StopModel? fromStop,
-    StopModel? toStop,
   });
-
-  $StopModelCopyWith<$Res>? get fromStop;
-  $StopModelCopyWith<$Res>? get toStop;
 }
 
 /// @nodoc
@@ -105,13 +98,11 @@ class _$ParcelModelCopyWithImpl<$Res, $Val extends ParcelModel>
     Object? status = null,
     Object? proofPhotoUrl = freezed,
     Object? deliveryOtp = freezed,
-    Object? createdAt = null,
+    Object? createdAt = freezed,
     Object? deliveredAt = freezed,
     Object? fromStopId = null,
     Object? toStopId = null,
     Object? tripId = freezed,
-    Object? fromStop = freezed,
-    Object? toStop = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -155,10 +146,10 @@ class _$ParcelModelCopyWithImpl<$Res, $Val extends ParcelModel>
                 ? _value.deliveryOtp
                 : deliveryOtp // ignore: cast_nullable_to_non_nullable
                       as String?,
-            createdAt: null == createdAt
+            createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
-                      as String,
+                      as DateTime?,
             deliveredAt: freezed == deliveredAt
                 ? _value.deliveredAt
                 : deliveredAt // ignore: cast_nullable_to_non_nullable
@@ -175,45 +166,9 @@ class _$ParcelModelCopyWithImpl<$Res, $Val extends ParcelModel>
                 ? _value.tripId
                 : tripId // ignore: cast_nullable_to_non_nullable
                       as int?,
-            fromStop: freezed == fromStop
-                ? _value.fromStop
-                : fromStop // ignore: cast_nullable_to_non_nullable
-                      as StopModel?,
-            toStop: freezed == toStop
-                ? _value.toStop
-                : toStop // ignore: cast_nullable_to_non_nullable
-                      as StopModel?,
           )
           as $Val,
     );
-  }
-
-  /// Create a copy of ParcelModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $StopModelCopyWith<$Res>? get fromStop {
-    if (_value.fromStop == null) {
-      return null;
-    }
-
-    return $StopModelCopyWith<$Res>(_value.fromStop!, (value) {
-      return _then(_value.copyWith(fromStop: value) as $Val);
-    });
-  }
-
-  /// Create a copy of ParcelModel
-  /// with the given fields replaced by the non-null parameter values.
-  @override
-  @pragma('vm:prefer-inline')
-  $StopModelCopyWith<$Res>? get toStop {
-    if (_value.toStop == null) {
-      return null;
-    }
-
-    return $StopModelCopyWith<$Res>(_value.toStop!, (value) {
-      return _then(_value.copyWith(toStop: value) as $Val);
-    });
   }
 }
 
@@ -237,19 +192,12 @@ abstract class _$$ParcelModelImplCopyWith<$Res>
     ParcelStatus status,
     String? proofPhotoUrl,
     String? deliveryOtp,
-    String createdAt,
+    DateTime? createdAt,
     String? deliveredAt,
     int fromStopId,
     int toStopId,
     int? tripId,
-    StopModel? fromStop,
-    StopModel? toStop,
   });
-
-  @override
-  $StopModelCopyWith<$Res>? get fromStop;
-  @override
-  $StopModelCopyWith<$Res>? get toStop;
 }
 
 /// @nodoc
@@ -276,13 +224,11 @@ class __$$ParcelModelImplCopyWithImpl<$Res>
     Object? status = null,
     Object? proofPhotoUrl = freezed,
     Object? deliveryOtp = freezed,
-    Object? createdAt = null,
+    Object? createdAt = freezed,
     Object? deliveredAt = freezed,
     Object? fromStopId = null,
     Object? toStopId = null,
     Object? tripId = freezed,
-    Object? fromStop = freezed,
-    Object? toStop = freezed,
   }) {
     return _then(
       _$ParcelModelImpl(
@@ -326,10 +272,10 @@ class __$$ParcelModelImplCopyWithImpl<$Res>
             ? _value.deliveryOtp
             : deliveryOtp // ignore: cast_nullable_to_non_nullable
                   as String?,
-        createdAt: null == createdAt
+        createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as DateTime?,
         deliveredAt: freezed == deliveredAt
             ? _value.deliveredAt
             : deliveredAt // ignore: cast_nullable_to_non_nullable
@@ -346,14 +292,6 @@ class __$$ParcelModelImplCopyWithImpl<$Res>
             ? _value.tripId
             : tripId // ignore: cast_nullable_to_non_nullable
                   as int?,
-        fromStop: freezed == fromStop
-            ? _value.fromStop
-            : fromStop // ignore: cast_nullable_to_non_nullable
-                  as StopModel?,
-        toStop: freezed == toStop
-            ? _value.toStop
-            : toStop // ignore: cast_nullable_to_non_nullable
-                  as StopModel?,
       ),
     );
   }
@@ -373,13 +311,11 @@ class _$ParcelModelImpl implements _ParcelModel {
     required this.status,
     this.proofPhotoUrl,
     this.deliveryOtp,
-    required this.createdAt,
+    this.createdAt,
     this.deliveredAt,
     required this.fromStopId,
     required this.toStopId,
     this.tripId,
-    this.fromStop,
-    this.toStop,
   });
 
   factory _$ParcelModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -406,7 +342,7 @@ class _$ParcelModelImpl implements _ParcelModel {
   @override
   final String? deliveryOtp;
   @override
-  final String createdAt;
+  final DateTime? createdAt;
   @override
   final String? deliveredAt;
   @override
@@ -415,14 +351,10 @@ class _$ParcelModelImpl implements _ParcelModel {
   final int toStopId;
   @override
   final int? tripId;
-  @override
-  final StopModel? fromStop;
-  @override
-  final StopModel? toStop;
 
   @override
   String toString() {
-    return 'ParcelModel(id: $id, code: $code, senderName: $senderName, senderPhone: $senderPhone, receiverName: $receiverName, receiverPhone: $receiverPhone, price: $price, status: $status, proofPhotoUrl: $proofPhotoUrl, deliveryOtp: $deliveryOtp, createdAt: $createdAt, deliveredAt: $deliveredAt, fromStopId: $fromStopId, toStopId: $toStopId, tripId: $tripId, fromStop: $fromStop, toStop: $toStop)';
+    return 'ParcelModel(id: $id, code: $code, senderName: $senderName, senderPhone: $senderPhone, receiverName: $receiverName, receiverPhone: $receiverPhone, price: $price, status: $status, proofPhotoUrl: $proofPhotoUrl, deliveryOtp: $deliveryOtp, createdAt: $createdAt, deliveredAt: $deliveredAt, fromStopId: $fromStopId, toStopId: $toStopId, tripId: $tripId)';
   }
 
   @override
@@ -454,10 +386,7 @@ class _$ParcelModelImpl implements _ParcelModel {
                 other.fromStopId == fromStopId) &&
             (identical(other.toStopId, toStopId) ||
                 other.toStopId == toStopId) &&
-            (identical(other.tripId, tripId) || other.tripId == tripId) &&
-            (identical(other.fromStop, fromStop) ||
-                other.fromStop == fromStop) &&
-            (identical(other.toStop, toStop) || other.toStop == toStop));
+            (identical(other.tripId, tripId) || other.tripId == tripId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -479,8 +408,6 @@ class _$ParcelModelImpl implements _ParcelModel {
     fromStopId,
     toStopId,
     tripId,
-    fromStop,
-    toStop,
   );
 
   /// Create a copy of ParcelModel
@@ -509,13 +436,11 @@ abstract class _ParcelModel implements ParcelModel {
     required final ParcelStatus status,
     final String? proofPhotoUrl,
     final String? deliveryOtp,
-    required final String createdAt,
+    final DateTime? createdAt,
     final String? deliveredAt,
     required final int fromStopId,
     required final int toStopId,
     final int? tripId,
-    final StopModel? fromStop,
-    final StopModel? toStop,
   }) = _$ParcelModelImpl;
 
   factory _ParcelModel.fromJson(Map<String, dynamic> json) =
@@ -542,7 +467,7 @@ abstract class _ParcelModel implements ParcelModel {
   @override
   String? get deliveryOtp;
   @override
-  String get createdAt;
+  DateTime? get createdAt;
   @override
   String? get deliveredAt;
   @override
@@ -551,10 +476,6 @@ abstract class _ParcelModel implements ParcelModel {
   int get toStopId;
   @override
   int? get tripId;
-  @override
-  StopModel? get fromStop;
-  @override
-  StopModel? get toStop;
 
   /// Create a copy of ParcelModel
   /// with the given fields replaced by the non-null parameter values.
@@ -577,6 +498,7 @@ mixin _$ParcelCreateRequest {
   double get price => throw _privateConstructorUsedError;
   int get fromStopId => throw _privateConstructorUsedError;
   int get toStopId => throw _privateConstructorUsedError;
+  int? get tripId => throw _privateConstructorUsedError;
 
   /// Serializes this ParcelCreateRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -603,6 +525,7 @@ abstract class $ParcelCreateRequestCopyWith<$Res> {
     double price,
     int fromStopId,
     int toStopId,
+    int? tripId,
   });
 }
 
@@ -628,6 +551,7 @@ class _$ParcelCreateRequestCopyWithImpl<$Res, $Val extends ParcelCreateRequest>
     Object? price = null,
     Object? fromStopId = null,
     Object? toStopId = null,
+    Object? tripId = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -659,6 +583,10 @@ class _$ParcelCreateRequestCopyWithImpl<$Res, $Val extends ParcelCreateRequest>
                 ? _value.toStopId
                 : toStopId // ignore: cast_nullable_to_non_nullable
                       as int,
+            tripId: freezed == tripId
+                ? _value.tripId
+                : tripId // ignore: cast_nullable_to_non_nullable
+                      as int?,
           )
           as $Val,
     );
@@ -682,6 +610,7 @@ abstract class _$$ParcelCreateRequestImplCopyWith<$Res>
     double price,
     int fromStopId,
     int toStopId,
+    int? tripId,
   });
 }
 
@@ -706,6 +635,7 @@ class __$$ParcelCreateRequestImplCopyWithImpl<$Res>
     Object? price = null,
     Object? fromStopId = null,
     Object? toStopId = null,
+    Object? tripId = freezed,
   }) {
     return _then(
       _$ParcelCreateRequestImpl(
@@ -737,6 +667,10 @@ class __$$ParcelCreateRequestImplCopyWithImpl<$Res>
             ? _value.toStopId
             : toStopId // ignore: cast_nullable_to_non_nullable
                   as int,
+        tripId: freezed == tripId
+            ? _value.tripId
+            : tripId // ignore: cast_nullable_to_non_nullable
+                  as int?,
       ),
     );
   }
@@ -753,6 +687,7 @@ class _$ParcelCreateRequestImpl implements _ParcelCreateRequest {
     required this.price,
     required this.fromStopId,
     required this.toStopId,
+    this.tripId,
   });
 
   factory _$ParcelCreateRequestImpl.fromJson(Map<String, dynamic> json) =>
@@ -772,10 +707,12 @@ class _$ParcelCreateRequestImpl implements _ParcelCreateRequest {
   final int fromStopId;
   @override
   final int toStopId;
+  @override
+  final int? tripId;
 
   @override
   String toString() {
-    return 'ParcelCreateRequest(senderName: $senderName, senderPhone: $senderPhone, receiverName: $receiverName, receiverPhone: $receiverPhone, price: $price, fromStopId: $fromStopId, toStopId: $toStopId)';
+    return 'ParcelCreateRequest(senderName: $senderName, senderPhone: $senderPhone, receiverName: $receiverName, receiverPhone: $receiverPhone, price: $price, fromStopId: $fromStopId, toStopId: $toStopId, tripId: $tripId)';
   }
 
   @override
@@ -795,7 +732,8 @@ class _$ParcelCreateRequestImpl implements _ParcelCreateRequest {
             (identical(other.fromStopId, fromStopId) ||
                 other.fromStopId == fromStopId) &&
             (identical(other.toStopId, toStopId) ||
-                other.toStopId == toStopId));
+                other.toStopId == toStopId) &&
+            (identical(other.tripId, tripId) || other.tripId == tripId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -809,6 +747,7 @@ class _$ParcelCreateRequestImpl implements _ParcelCreateRequest {
     price,
     fromStopId,
     toStopId,
+    tripId,
   );
 
   /// Create a copy of ParcelCreateRequest
@@ -837,6 +776,7 @@ abstract class _ParcelCreateRequest implements ParcelCreateRequest {
     required final double price,
     required final int fromStopId,
     required final int toStopId,
+    final int? tripId,
   }) = _$ParcelCreateRequestImpl;
 
   factory _ParcelCreateRequest.fromJson(Map<String, dynamic> json) =
@@ -856,6 +796,8 @@ abstract class _ParcelCreateRequest implements ParcelCreateRequest {
   int get fromStopId;
   @override
   int get toStopId;
+  @override
+  int? get tripId;
 
   /// Create a copy of ParcelCreateRequest
   /// with the given fields replaced by the non-null parameter values.

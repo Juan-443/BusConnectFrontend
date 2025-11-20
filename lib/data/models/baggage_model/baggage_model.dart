@@ -11,6 +11,9 @@ class BaggageModel with _$BaggageModel {
     required double fee,
     required String tagCode,
     required int ticketId,
+    String? passengerName,
+    String? tripInfo,
+    bool? excessWeight,
   }) = _BaggageModel;
 
   factory BaggageModel.fromJson(Map<String, dynamic> json) =>

@@ -18,17 +18,13 @@ _$ParcelModelImpl _$$ParcelModelImplFromJson(Map<String, dynamic> json) =>
       status: $enumDecode(_$ParcelStatusEnumMap, json['status']),
       proofPhotoUrl: json['proofPhotoUrl'] as String?,
       deliveryOtp: json['deliveryOtp'] as String?,
-      createdAt: json['createdAt'] as String,
+      createdAt: json['createdAt'] == null
+          ? null
+          : DateTime.parse(json['createdAt'] as String),
       deliveredAt: json['deliveredAt'] as String?,
       fromStopId: (json['fromStopId'] as num).toInt(),
       toStopId: (json['toStopId'] as num).toInt(),
       tripId: (json['tripId'] as num?)?.toInt(),
-      fromStop: json['fromStop'] == null
-          ? null
-          : StopModel.fromJson(json['fromStop'] as Map<String, dynamic>),
-      toStop: json['toStop'] == null
-          ? null
-          : StopModel.fromJson(json['toStop'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$ParcelModelImplToJson(_$ParcelModelImpl instance) =>
@@ -43,13 +39,11 @@ Map<String, dynamic> _$$ParcelModelImplToJson(_$ParcelModelImpl instance) =>
       'status': _$ParcelStatusEnumMap[instance.status]!,
       'proofPhotoUrl': instance.proofPhotoUrl,
       'deliveryOtp': instance.deliveryOtp,
-      'createdAt': instance.createdAt,
+      'createdAt': instance.createdAt?.toIso8601String(),
       'deliveredAt': instance.deliveredAt,
       'fromStopId': instance.fromStopId,
       'toStopId': instance.toStopId,
       'tripId': instance.tripId,
-      'fromStop': instance.fromStop,
-      'toStop': instance.toStop,
     };
 
 const _$ParcelStatusEnumMap = {
@@ -69,6 +63,7 @@ _$ParcelCreateRequestImpl _$$ParcelCreateRequestImplFromJson(
   price: (json['price'] as num).toDouble(),
   fromStopId: (json['fromStopId'] as num).toInt(),
   toStopId: (json['toStopId'] as num).toInt(),
+  tripId: (json['tripId'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$$ParcelCreateRequestImplToJson(
@@ -81,6 +76,7 @@ Map<String, dynamic> _$$ParcelCreateRequestImplToJson(
   'price': instance.price,
   'fromStopId': instance.fromStopId,
   'toStopId': instance.toStopId,
+  'tripId': instance.tripId,
 };
 
 _$ParcelUpdateRequestImpl _$$ParcelUpdateRequestImplFromJson(

@@ -1,3 +1,9 @@
+import 'package:bus_connect/data/providers/baggage_api_provider.dart';
+import 'package:bus_connect/data/providers/seat_api_provider.dart';
+import 'package:bus_connect/data/providers/seat_hold_api_provider.dart';
+import 'package:bus_connect/data/repositories/baggage_repository.dart';
+import 'package:bus_connect/data/repositories/seat_hold_repository.dart';
+import 'package:bus_connect/data/repositories/seat_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
@@ -38,11 +44,11 @@ import 'presentation/providers/overbooking_provider.dart';
 // Network
 import 'core/network/api_client.dart';
 
-// Providers para los repositorios
+// ==================== CORE PROVIDERS ====================
 final apiClientProvider = Provider((ref) => ApiClient());
 final dioProvider = Provider((ref) => ref.watch(apiClientProvider).dio);
 
-// API Providers
+// ==================== API PROVIDERS ====================
 final authApiProvider = Provider((ref) => AuthApiProvider(ref.watch(dioProvider)));
 final userApiProvider = Provider((ref) => UserApiProvider(ref.watch(dioProvider)));
 final busApiProvider = Provider((ref) => BusApiProvider(ref.watch(dioProvider)));
@@ -55,8 +61,12 @@ final incidentApiProvider = Provider((ref) => IncidentApiProvider(ref.watch(dioP
 final tripApiProvider = Provider((ref) => TripApiProvider(ref.watch(dioProvider)));
 final ticketApiProvider = Provider((ref) => TicketApiProvider(ref.watch(dioProvider)));
 final parcelApiProvider = Provider((ref) => ParcelApiProvider(ref.watch(dioProvider)));
+final overbookingApiProvider = Provider((ref) => OverbookingApiProvider(ref.watch(dioProvider)));
+final baggageApiProvider = Provider((ref) => BaggageApiProvider(ref.watch(dioProvider)));
+final seatHoldApiProvider = Provider((ref) => SeatHoldApiProvider(ref.watch(dioProvider))); // ✅ AGREGAR
+final seatApiProvider = Provider((ref) => SeatApiProvider(ref.watch(dioProvider))); // ✅ AGREGAR
 
-// Repositories
+// ==================== REPOSITORIES ====================
 final authRepositoryProvider = Provider((ref) => AuthRepository(ref.watch(authApiProvider)));
 final userRepositoryProvider = Provider((ref) => UserRepository(ref.watch(userApiProvider)));
 final busRepositoryProvider = Provider((ref) => BusRepository(ref.watch(busApiProvider)));
@@ -69,13 +79,16 @@ final incidentRepositoryProvider = Provider((ref) => IncidentRepository(ref.watc
 final tripRepositoryProvider = Provider((ref) => TripRepository(ref.watch(tripApiProvider)));
 final ticketRepositoryProvider = Provider((ref) => TicketRepository(ref.watch(ticketApiProvider)));
 final parcelRepositoryProvider = Provider((ref) => ParcelRepository(ref.watch(parcelApiProvider)));
+final overbookingRepositoryProvider = Provider((ref) => OverbookingRepository(ref.watch(overbookingApiProvider)));
+final baggageRepositoryProvider = Provider((ref) => BaggageRepository(ref.watch(baggageApiProvider)));
 
-final overbookingApiProvider = Provider((ref) => OverbookingApiProvider(ref.watch(dioProvider)),);
-final overbookingRepositoryProvider = Provider((ref) => OverbookingRepository(ref.watch(overbookingApiProvider)),);
+final seatHoldRepositoryProvider = Provider((ref) => SeatHoldRepository(ref.watch(seatHoldApiProvider)));
+final seatRepositoryProvider = Provider((ref) => SeatRepository(ref.watch(seatApiProvider)));
 
-// State Notifier / ChangeNotifier
+// ==================== STATE NOTIFIERS ====================
 final overbookingProvider = StateNotifierProvider<OverbookingNotifier, OverbookingState>(
-      (ref) => OverbookingNotifier(ref.watch(overbookingRepositoryProvider)),);
+      (ref) => OverbookingNotifier(ref.watch(overbookingRepositoryProvider)),
+);
 
 class MyApp extends ConsumerWidget {
   const MyApp({Key? key}) : super(key: key);

@@ -24,9 +24,11 @@ mixin _$StopModel {
   int get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   int get order => throw _privateConstructorUsedError;
-  double? get lat => throw _privateConstructorUsedError;
-  double? get lng => throw _privateConstructorUsedError;
-  int? get routeId => throw _privateConstructorUsedError;
+  double get lat => throw _privateConstructorUsedError;
+  double get lng => throw _privateConstructorUsedError;
+  int get routeId => throw _privateConstructorUsedError;
+  String? get routeName => throw _privateConstructorUsedError;
+  String? get routeCode => throw _privateConstructorUsedError;
 
   /// Serializes this StopModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -47,9 +49,11 @@ abstract class $StopModelCopyWith<$Res> {
     int id,
     String name,
     int order,
-    double? lat,
-    double? lng,
-    int? routeId,
+    double lat,
+    double lng,
+    int routeId,
+    String? routeName,
+    String? routeCode,
   });
 }
 
@@ -71,9 +75,11 @@ class _$StopModelCopyWithImpl<$Res, $Val extends StopModel>
     Object? id = null,
     Object? name = null,
     Object? order = null,
-    Object? lat = freezed,
-    Object? lng = freezed,
-    Object? routeId = freezed,
+    Object? lat = null,
+    Object? lng = null,
+    Object? routeId = null,
+    Object? routeName = freezed,
+    Object? routeCode = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -89,18 +95,26 @@ class _$StopModelCopyWithImpl<$Res, $Val extends StopModel>
                 ? _value.order
                 : order // ignore: cast_nullable_to_non_nullable
                       as int,
-            lat: freezed == lat
+            lat: null == lat
                 ? _value.lat
                 : lat // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            lng: freezed == lng
+                      as double,
+            lng: null == lng
                 ? _value.lng
                 : lng // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            routeId: freezed == routeId
+                      as double,
+            routeId: null == routeId
                 ? _value.routeId
                 : routeId // ignore: cast_nullable_to_non_nullable
-                      as int?,
+                      as int,
+            routeName: freezed == routeName
+                ? _value.routeName
+                : routeName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            routeCode: freezed == routeCode
+                ? _value.routeCode
+                : routeCode // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -120,9 +134,11 @@ abstract class _$$StopModelImplCopyWith<$Res>
     int id,
     String name,
     int order,
-    double? lat,
-    double? lng,
-    int? routeId,
+    double lat,
+    double lng,
+    int routeId,
+    String? routeName,
+    String? routeCode,
   });
 }
 
@@ -143,9 +159,11 @@ class __$$StopModelImplCopyWithImpl<$Res>
     Object? id = null,
     Object? name = null,
     Object? order = null,
-    Object? lat = freezed,
-    Object? lng = freezed,
-    Object? routeId = freezed,
+    Object? lat = null,
+    Object? lng = null,
+    Object? routeId = null,
+    Object? routeName = freezed,
+    Object? routeCode = freezed,
   }) {
     return _then(
       _$StopModelImpl(
@@ -161,18 +179,26 @@ class __$$StopModelImplCopyWithImpl<$Res>
             ? _value.order
             : order // ignore: cast_nullable_to_non_nullable
                   as int,
-        lat: freezed == lat
+        lat: null == lat
             ? _value.lat
             : lat // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        lng: freezed == lng
+                  as double,
+        lng: null == lng
             ? _value.lng
             : lng // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        routeId: freezed == routeId
+                  as double,
+        routeId: null == routeId
             ? _value.routeId
             : routeId // ignore: cast_nullable_to_non_nullable
-                  as int?,
+                  as int,
+        routeName: freezed == routeName
+            ? _value.routeName
+            : routeName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        routeCode: freezed == routeCode
+            ? _value.routeCode
+            : routeCode // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -185,9 +211,11 @@ class _$StopModelImpl implements _StopModel {
     required this.id,
     required this.name,
     required this.order,
-    this.lat,
-    this.lng,
-    this.routeId,
+    required this.lat,
+    required this.lng,
+    required this.routeId,
+    this.routeName,
+    this.routeCode,
   });
 
   factory _$StopModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -200,15 +228,19 @@ class _$StopModelImpl implements _StopModel {
   @override
   final int order;
   @override
-  final double? lat;
+  final double lat;
   @override
-  final double? lng;
+  final double lng;
   @override
-  final int? routeId;
+  final int routeId;
+  @override
+  final String? routeName;
+  @override
+  final String? routeCode;
 
   @override
   String toString() {
-    return 'StopModel(id: $id, name: $name, order: $order, lat: $lat, lng: $lng, routeId: $routeId)';
+    return 'StopModel(id: $id, name: $name, order: $order, lat: $lat, lng: $lng, routeId: $routeId, routeName: $routeName, routeCode: $routeCode)';
   }
 
   @override
@@ -221,13 +253,26 @@ class _$StopModelImpl implements _StopModel {
             (identical(other.order, order) || other.order == order) &&
             (identical(other.lat, lat) || other.lat == lat) &&
             (identical(other.lng, lng) || other.lng == lng) &&
-            (identical(other.routeId, routeId) || other.routeId == routeId));
+            (identical(other.routeId, routeId) || other.routeId == routeId) &&
+            (identical(other.routeName, routeName) ||
+                other.routeName == routeName) &&
+            (identical(other.routeCode, routeCode) ||
+                other.routeCode == routeCode));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, name, order, lat, lng, routeId);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    name,
+    order,
+    lat,
+    lng,
+    routeId,
+    routeName,
+    routeCode,
+  );
 
   /// Create a copy of StopModel
   /// with the given fields replaced by the non-null parameter values.
@@ -248,9 +293,11 @@ abstract class _StopModel implements StopModel {
     required final int id,
     required final String name,
     required final int order,
-    final double? lat,
-    final double? lng,
-    final int? routeId,
+    required final double lat,
+    required final double lng,
+    required final int routeId,
+    final String? routeName,
+    final String? routeCode,
   }) = _$StopModelImpl;
 
   factory _StopModel.fromJson(Map<String, dynamic> json) =
@@ -263,11 +310,15 @@ abstract class _StopModel implements StopModel {
   @override
   int get order;
   @override
-  double? get lat;
+  double get lat;
   @override
-  double? get lng;
+  double get lng;
   @override
-  int? get routeId;
+  int get routeId;
+  @override
+  String? get routeName;
+  @override
+  String? get routeCode;
 
   /// Create a copy of StopModel
   /// with the given fields replaced by the non-null parameter values.
@@ -283,11 +334,11 @@ StopCreateRequest _$StopCreateRequestFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$StopCreateRequest {
-  int get routeId => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
   int get order => throw _privateConstructorUsedError;
-  double? get lat => throw _privateConstructorUsedError;
-  double? get lng => throw _privateConstructorUsedError;
+  double get lat => throw _privateConstructorUsedError;
+  double get lng => throw _privateConstructorUsedError;
+  int get routeId => throw _privateConstructorUsedError;
 
   /// Serializes this StopCreateRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -306,7 +357,7 @@ abstract class $StopCreateRequestCopyWith<$Res> {
     $Res Function(StopCreateRequest) then,
   ) = _$StopCreateRequestCopyWithImpl<$Res, StopCreateRequest>;
   @useResult
-  $Res call({int routeId, String name, int order, double? lat, double? lng});
+  $Res call({String name, int order, double lat, double lng, int routeId});
 }
 
 /// @nodoc
@@ -324,18 +375,14 @@ class _$StopCreateRequestCopyWithImpl<$Res, $Val extends StopCreateRequest>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? routeId = null,
     Object? name = null,
     Object? order = null,
-    Object? lat = freezed,
-    Object? lng = freezed,
+    Object? lat = null,
+    Object? lng = null,
+    Object? routeId = null,
   }) {
     return _then(
       _value.copyWith(
-            routeId: null == routeId
-                ? _value.routeId
-                : routeId // ignore: cast_nullable_to_non_nullable
-                      as int,
             name: null == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
@@ -344,14 +391,18 @@ class _$StopCreateRequestCopyWithImpl<$Res, $Val extends StopCreateRequest>
                 ? _value.order
                 : order // ignore: cast_nullable_to_non_nullable
                       as int,
-            lat: freezed == lat
+            lat: null == lat
                 ? _value.lat
                 : lat // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            lng: freezed == lng
+                      as double,
+            lng: null == lng
                 ? _value.lng
                 : lng // ignore: cast_nullable_to_non_nullable
-                      as double?,
+                      as double,
+            routeId: null == routeId
+                ? _value.routeId
+                : routeId // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -367,7 +418,7 @@ abstract class _$$StopCreateRequestImplCopyWith<$Res>
   ) = __$$StopCreateRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int routeId, String name, int order, double? lat, double? lng});
+  $Res call({String name, int order, double lat, double lng, int routeId});
 }
 
 /// @nodoc
@@ -384,18 +435,14 @@ class __$$StopCreateRequestImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? routeId = null,
     Object? name = null,
     Object? order = null,
-    Object? lat = freezed,
-    Object? lng = freezed,
+    Object? lat = null,
+    Object? lng = null,
+    Object? routeId = null,
   }) {
     return _then(
       _$StopCreateRequestImpl(
-        routeId: null == routeId
-            ? _value.routeId
-            : routeId // ignore: cast_nullable_to_non_nullable
-                  as int,
         name: null == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
@@ -404,14 +451,18 @@ class __$$StopCreateRequestImplCopyWithImpl<$Res>
             ? _value.order
             : order // ignore: cast_nullable_to_non_nullable
                   as int,
-        lat: freezed == lat
+        lat: null == lat
             ? _value.lat
             : lat // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        lng: freezed == lng
+                  as double,
+        lng: null == lng
             ? _value.lng
             : lng // ignore: cast_nullable_to_non_nullable
-                  as double?,
+                  as double,
+        routeId: null == routeId
+            ? _value.routeId
+            : routeId // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -421,30 +472,30 @@ class __$$StopCreateRequestImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$StopCreateRequestImpl implements _StopCreateRequest {
   const _$StopCreateRequestImpl({
-    required this.routeId,
     required this.name,
     required this.order,
-    this.lat,
-    this.lng,
+    required this.lat,
+    required this.lng,
+    required this.routeId,
   });
 
   factory _$StopCreateRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$StopCreateRequestImplFromJson(json);
 
   @override
-  final int routeId;
-  @override
   final String name;
   @override
   final int order;
   @override
-  final double? lat;
+  final double lat;
   @override
-  final double? lng;
+  final double lng;
+  @override
+  final int routeId;
 
   @override
   String toString() {
-    return 'StopCreateRequest(routeId: $routeId, name: $name, order: $order, lat: $lat, lng: $lng)';
+    return 'StopCreateRequest(name: $name, order: $order, lat: $lat, lng: $lng, routeId: $routeId)';
   }
 
   @override
@@ -452,16 +503,16 @@ class _$StopCreateRequestImpl implements _StopCreateRequest {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$StopCreateRequestImpl &&
-            (identical(other.routeId, routeId) || other.routeId == routeId) &&
             (identical(other.name, name) || other.name == name) &&
             (identical(other.order, order) || other.order == order) &&
             (identical(other.lat, lat) || other.lat == lat) &&
-            (identical(other.lng, lng) || other.lng == lng));
+            (identical(other.lng, lng) || other.lng == lng) &&
+            (identical(other.routeId, routeId) || other.routeId == routeId));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, routeId, name, order, lat, lng);
+  int get hashCode => Object.hash(runtimeType, name, order, lat, lng, routeId);
 
   /// Create a copy of StopCreateRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -482,26 +533,26 @@ class _$StopCreateRequestImpl implements _StopCreateRequest {
 
 abstract class _StopCreateRequest implements StopCreateRequest {
   const factory _StopCreateRequest({
-    required final int routeId,
     required final String name,
     required final int order,
-    final double? lat,
-    final double? lng,
+    required final double lat,
+    required final double lng,
+    required final int routeId,
   }) = _$StopCreateRequestImpl;
 
   factory _StopCreateRequest.fromJson(Map<String, dynamic> json) =
       _$StopCreateRequestImpl.fromJson;
 
   @override
-  int get routeId;
-  @override
   String get name;
   @override
   int get order;
   @override
-  double? get lat;
+  double get lat;
   @override
-  double? get lng;
+  double get lng;
+  @override
+  int get routeId;
 
   /// Create a copy of StopCreateRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -517,10 +568,8 @@ StopUpdateRequest _$StopUpdateRequestFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$StopUpdateRequest {
-  String? get name => throw _privateConstructorUsedError;
-  int? get order => throw _privateConstructorUsedError;
-  double? get lat => throw _privateConstructorUsedError;
-  double? get lng => throw _privateConstructorUsedError;
+  String get name => throw _privateConstructorUsedError;
+  int get order => throw _privateConstructorUsedError;
 
   /// Serializes this StopUpdateRequest to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -539,7 +588,7 @@ abstract class $StopUpdateRequestCopyWith<$Res> {
     $Res Function(StopUpdateRequest) then,
   ) = _$StopUpdateRequestCopyWithImpl<$Res, StopUpdateRequest>;
   @useResult
-  $Res call({String? name, int? order, double? lat, double? lng});
+  $Res call({String name, int order});
 }
 
 /// @nodoc
@@ -556,30 +605,17 @@ class _$StopUpdateRequestCopyWithImpl<$Res, $Val extends StopUpdateRequest>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? name = freezed,
-    Object? order = freezed,
-    Object? lat = freezed,
-    Object? lng = freezed,
-  }) {
+  $Res call({Object? name = null, Object? order = null}) {
     return _then(
       _value.copyWith(
-            name: freezed == name
+            name: null == name
                 ? _value.name
                 : name // ignore: cast_nullable_to_non_nullable
-                      as String?,
-            order: freezed == order
+                      as String,
+            order: null == order
                 ? _value.order
                 : order // ignore: cast_nullable_to_non_nullable
-                      as int?,
-            lat: freezed == lat
-                ? _value.lat
-                : lat // ignore: cast_nullable_to_non_nullable
-                      as double?,
-            lng: freezed == lng
-                ? _value.lng
-                : lng // ignore: cast_nullable_to_non_nullable
-                      as double?,
+                      as int,
           )
           as $Val,
     );
@@ -595,7 +631,7 @@ abstract class _$$StopUpdateRequestImplCopyWith<$Res>
   ) = __$$StopUpdateRequestImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String? name, int? order, double? lat, double? lng});
+  $Res call({String name, int order});
 }
 
 /// @nodoc
@@ -611,30 +647,17 @@ class __$$StopUpdateRequestImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({
-    Object? name = freezed,
-    Object? order = freezed,
-    Object? lat = freezed,
-    Object? lng = freezed,
-  }) {
+  $Res call({Object? name = null, Object? order = null}) {
     return _then(
       _$StopUpdateRequestImpl(
-        name: freezed == name
+        name: null == name
             ? _value.name
             : name // ignore: cast_nullable_to_non_nullable
-                  as String?,
-        order: freezed == order
+                  as String,
+        order: null == order
             ? _value.order
             : order // ignore: cast_nullable_to_non_nullable
-                  as int?,
-        lat: freezed == lat
-            ? _value.lat
-            : lat // ignore: cast_nullable_to_non_nullable
-                  as double?,
-        lng: freezed == lng
-            ? _value.lng
-            : lng // ignore: cast_nullable_to_non_nullable
-                  as double?,
+                  as int,
       ),
     );
   }
@@ -643,23 +666,19 @@ class __$$StopUpdateRequestImplCopyWithImpl<$Res>
 /// @nodoc
 @JsonSerializable()
 class _$StopUpdateRequestImpl implements _StopUpdateRequest {
-  const _$StopUpdateRequestImpl({this.name, this.order, this.lat, this.lng});
+  const _$StopUpdateRequestImpl({required this.name, required this.order});
 
   factory _$StopUpdateRequestImpl.fromJson(Map<String, dynamic> json) =>
       _$$StopUpdateRequestImplFromJson(json);
 
   @override
-  final String? name;
+  final String name;
   @override
-  final int? order;
-  @override
-  final double? lat;
-  @override
-  final double? lng;
+  final int order;
 
   @override
   String toString() {
-    return 'StopUpdateRequest(name: $name, order: $order, lat: $lat, lng: $lng)';
+    return 'StopUpdateRequest(name: $name, order: $order)';
   }
 
   @override
@@ -668,14 +687,12 @@ class _$StopUpdateRequestImpl implements _StopUpdateRequest {
         (other.runtimeType == runtimeType &&
             other is _$StopUpdateRequestImpl &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.order, order) || other.order == order) &&
-            (identical(other.lat, lat) || other.lat == lat) &&
-            (identical(other.lng, lng) || other.lng == lng));
+            (identical(other.order, order) || other.order == order));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, name, order, lat, lng);
+  int get hashCode => Object.hash(runtimeType, name, order);
 
   /// Create a copy of StopUpdateRequest
   /// with the given fields replaced by the non-null parameter values.
@@ -696,23 +713,17 @@ class _$StopUpdateRequestImpl implements _StopUpdateRequest {
 
 abstract class _StopUpdateRequest implements StopUpdateRequest {
   const factory _StopUpdateRequest({
-    final String? name,
-    final int? order,
-    final double? lat,
-    final double? lng,
+    required final String name,
+    required final int order,
   }) = _$StopUpdateRequestImpl;
 
   factory _StopUpdateRequest.fromJson(Map<String, dynamic> json) =
       _$StopUpdateRequestImpl.fromJson;
 
   @override
-  String? get name;
+  String get name;
   @override
-  int? get order;
-  @override
-  double? get lat;
-  @override
-  double? get lng;
+  int get order;
 
   /// Create a copy of StopUpdateRequest
   /// with the given fields replaced by the non-null parameter values.

@@ -185,9 +185,14 @@ class AssignmentNotifier extends StateNotifier<AssignmentState> {
 
   void clearSelectedAssignment() =>
       state = state.copyWith(selectedAssignment: null);
+
+  void selectAssignment(AssignmentResponse assignment) {
+    state = state.copyWith(selectedAssignment: assignment);
+  }
 }
 
 // ==================== PROVIDERS ====================
+
 
 // Repository provider
 final assignmentRepositoryProvider = Provider<AssignmentRepository>((ref) {

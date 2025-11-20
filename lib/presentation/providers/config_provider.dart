@@ -1,15 +1,7 @@
-import 'package:bus_connect/core/network/api_client.dart';
-import 'package:bus_connect/data/providers/config_api_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/config_model/config_model.dart';
 import '../../data/repositories/config_repository.dart';
-
-/// ==================== REPOSITORY PROVIDER ====================
-final configRepositoryProvider = Provider<ConfigRepository>((ref) {
-  final dio = ApiClient().dio;
-  final apiProvider = ConfigApiProvider(dio);
-  return ConfigRepository(apiProvider);
-});
+import 'package:bus_connect/app.dart';
 
 /// ==================== STATE ====================
 class ConfigState {

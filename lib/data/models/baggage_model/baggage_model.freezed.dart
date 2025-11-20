@@ -26,6 +26,9 @@ mixin _$BaggageModel {
   double get fee => throw _privateConstructorUsedError;
   String get tagCode => throw _privateConstructorUsedError;
   int get ticketId => throw _privateConstructorUsedError;
+  String? get passengerName => throw _privateConstructorUsedError;
+  String? get tripInfo => throw _privateConstructorUsedError;
+  bool? get excessWeight => throw _privateConstructorUsedError;
 
   /// Serializes this BaggageModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -50,6 +53,9 @@ abstract class $BaggageModelCopyWith<$Res> {
     double fee,
     String tagCode,
     int ticketId,
+    String? passengerName,
+    String? tripInfo,
+    bool? excessWeight,
   });
 }
 
@@ -73,6 +79,9 @@ class _$BaggageModelCopyWithImpl<$Res, $Val extends BaggageModel>
     Object? fee = null,
     Object? tagCode = null,
     Object? ticketId = null,
+    Object? passengerName = freezed,
+    Object? tripInfo = freezed,
+    Object? excessWeight = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -96,6 +105,18 @@ class _$BaggageModelCopyWithImpl<$Res, $Val extends BaggageModel>
                 ? _value.ticketId
                 : ticketId // ignore: cast_nullable_to_non_nullable
                       as int,
+            passengerName: freezed == passengerName
+                ? _value.passengerName
+                : passengerName // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            tripInfo: freezed == tripInfo
+                ? _value.tripInfo
+                : tripInfo // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            excessWeight: freezed == excessWeight
+                ? _value.excessWeight
+                : excessWeight // ignore: cast_nullable_to_non_nullable
+                      as bool?,
           )
           as $Val,
     );
@@ -117,6 +138,9 @@ abstract class _$$BaggageModelImplCopyWith<$Res>
     double fee,
     String tagCode,
     int ticketId,
+    String? passengerName,
+    String? tripInfo,
+    bool? excessWeight,
   });
 }
 
@@ -139,6 +163,9 @@ class __$$BaggageModelImplCopyWithImpl<$Res>
     Object? fee = null,
     Object? tagCode = null,
     Object? ticketId = null,
+    Object? passengerName = freezed,
+    Object? tripInfo = freezed,
+    Object? excessWeight = freezed,
   }) {
     return _then(
       _$BaggageModelImpl(
@@ -162,6 +189,18 @@ class __$$BaggageModelImplCopyWithImpl<$Res>
             ? _value.ticketId
             : ticketId // ignore: cast_nullable_to_non_nullable
                   as int,
+        passengerName: freezed == passengerName
+            ? _value.passengerName
+            : passengerName // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        tripInfo: freezed == tripInfo
+            ? _value.tripInfo
+            : tripInfo // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        excessWeight: freezed == excessWeight
+            ? _value.excessWeight
+            : excessWeight // ignore: cast_nullable_to_non_nullable
+                  as bool?,
       ),
     );
   }
@@ -176,6 +215,9 @@ class _$BaggageModelImpl implements _BaggageModel {
     required this.fee,
     required this.tagCode,
     required this.ticketId,
+    this.passengerName,
+    this.tripInfo,
+    this.excessWeight,
   });
 
   factory _$BaggageModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -191,10 +233,16 @@ class _$BaggageModelImpl implements _BaggageModel {
   final String tagCode;
   @override
   final int ticketId;
+  @override
+  final String? passengerName;
+  @override
+  final String? tripInfo;
+  @override
+  final bool? excessWeight;
 
   @override
   String toString() {
-    return 'BaggageModel(id: $id, weightKg: $weightKg, fee: $fee, tagCode: $tagCode, ticketId: $ticketId)';
+    return 'BaggageModel(id: $id, weightKg: $weightKg, fee: $fee, tagCode: $tagCode, ticketId: $ticketId, passengerName: $passengerName, tripInfo: $tripInfo, excessWeight: $excessWeight)';
   }
 
   @override
@@ -208,13 +256,28 @@ class _$BaggageModelImpl implements _BaggageModel {
             (identical(other.fee, fee) || other.fee == fee) &&
             (identical(other.tagCode, tagCode) || other.tagCode == tagCode) &&
             (identical(other.ticketId, ticketId) ||
-                other.ticketId == ticketId));
+                other.ticketId == ticketId) &&
+            (identical(other.passengerName, passengerName) ||
+                other.passengerName == passengerName) &&
+            (identical(other.tripInfo, tripInfo) ||
+                other.tripInfo == tripInfo) &&
+            (identical(other.excessWeight, excessWeight) ||
+                other.excessWeight == excessWeight));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, weightKg, fee, tagCode, ticketId);
+  int get hashCode => Object.hash(
+    runtimeType,
+    id,
+    weightKg,
+    fee,
+    tagCode,
+    ticketId,
+    passengerName,
+    tripInfo,
+    excessWeight,
+  );
 
   /// Create a copy of BaggageModel
   /// with the given fields replaced by the non-null parameter values.
@@ -237,6 +300,9 @@ abstract class _BaggageModel implements BaggageModel {
     required final double fee,
     required final String tagCode,
     required final int ticketId,
+    final String? passengerName,
+    final String? tripInfo,
+    final bool? excessWeight,
   }) = _$BaggageModelImpl;
 
   factory _BaggageModel.fromJson(Map<String, dynamic> json) =
@@ -252,6 +318,12 @@ abstract class _BaggageModel implements BaggageModel {
   String get tagCode;
   @override
   int get ticketId;
+  @override
+  String? get passengerName;
+  @override
+  String? get tripInfo;
+  @override
+  bool? get excessWeight;
 
   /// Create a copy of BaggageModel
   /// with the given fields replaced by the non-null parameter values.

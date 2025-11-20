@@ -16,6 +16,8 @@ class FareRuleModel with _$FareRuleModel {
     required int routeId,
     required int fromStopId,
     required int toStopId,
+    String? fromStopName,
+    String? toStopName,
   }) = _FareRuleModel;
 
   factory FareRuleModel.fromJson(Map<String, dynamic> json) =>

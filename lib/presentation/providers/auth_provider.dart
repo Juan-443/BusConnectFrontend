@@ -1,28 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:bus_connect/data/models/user_model/user_model.dart';
-import '../../core/network/api_client.dart';
-import '../../data/providers/auth_api_provider.dart';
 import '../../data/repositories/auth_repository.dart';
-
-/// ==================== API CLIENT PROVIDER ====================
-
-final apiClientProvider = Provider<ApiClient>((ref) => ApiClient());
-
-/// ==================== AUTH API PROVIDER ====================
-
-final authApiProvider = Provider<AuthApiProvider>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return AuthApiProvider(apiClient.dio);
-});
-
-/// ==================== AUTH REPOSITORY PROVIDER ====================
-
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  final apiProvider = ref.watch(authApiProvider);
-  return AuthRepository(apiProvider);
-});
-
-/// ==================== AUTH STATE ====================
+import 'package:bus_connect/app.dart';
 
 class AuthState {
   final bool isAuthenticated;
@@ -52,28 +31,43 @@ class AuthState {
   }
 }
 
-/// ==================== AUTH NOTIFIER ====================
-
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _repository;
 
   AuthNotifier(this._repository) : super(const AuthState()) {
-    checkAuthStatus();
+    _initAuthState();
+  }
+
+  Future<void> _initAuthState() async {
+    try {
+      final isLoggedIn = await _repository.isLoggedIn();
+
+      if (!isLoggedIn) {
+        return;
+      }
+
+      final result = await _repository.getCurrentUser();
+
+      result.fold(
+            (failure) {
+          _repository.logout();
+          state = const AuthState(isAuthenticated: false);
+        },
+            (user) {
+          state = state.copyWith(
+            isAuthenticated: true,
+            user: user,
+          );
+        },
+      );
+    } catch (e) {
+      await _repository.logout();
+      state = const AuthState(isAuthenticated: false);
+    }
   }
 
   Future<void> checkAuthStatus() async {
-    final isLoggedIn = await _repository.isLoggedIn();
-
-    if (isLoggedIn) {
-      final result = await _repository.getCurrentUser();
-      result.fold(
-            (failure) => state = state.copyWith(isAuthenticated: false),
-            (user) => state = state.copyWith(
-          isAuthenticated: true,
-          user: user,
-        ),
-      );
-    }
+    await _initAuthState();
   }
 
   Future<bool> login(String email, String password) async {

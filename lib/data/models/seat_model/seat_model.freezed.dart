@@ -25,6 +25,8 @@ mixin _$SeatModel {
   String get number => throw _privateConstructorUsedError;
   SeatType get type => throw _privateConstructorUsedError;
   int get busId => throw _privateConstructorUsedError;
+  String? get busPlate => throw _privateConstructorUsedError;
+  int? get busCapacity => throw _privateConstructorUsedError;
 
   /// Serializes this SeatModel to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -41,7 +43,14 @@ abstract class $SeatModelCopyWith<$Res> {
   factory $SeatModelCopyWith(SeatModel value, $Res Function(SeatModel) then) =
       _$SeatModelCopyWithImpl<$Res, SeatModel>;
   @useResult
-  $Res call({int id, String number, SeatType type, int busId});
+  $Res call({
+    int id,
+    String number,
+    SeatType type,
+    int busId,
+    String? busPlate,
+    int? busCapacity,
+  });
 }
 
 /// @nodoc
@@ -63,6 +72,8 @@ class _$SeatModelCopyWithImpl<$Res, $Val extends SeatModel>
     Object? number = null,
     Object? type = null,
     Object? busId = null,
+    Object? busPlate = freezed,
+    Object? busCapacity = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -82,6 +93,14 @@ class _$SeatModelCopyWithImpl<$Res, $Val extends SeatModel>
                 ? _value.busId
                 : busId // ignore: cast_nullable_to_non_nullable
                       as int,
+            busPlate: freezed == busPlate
+                ? _value.busPlate
+                : busPlate // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            busCapacity: freezed == busCapacity
+                ? _value.busCapacity
+                : busCapacity // ignore: cast_nullable_to_non_nullable
+                      as int?,
           )
           as $Val,
     );
@@ -97,7 +116,14 @@ abstract class _$$SeatModelImplCopyWith<$Res>
   ) = __$$SeatModelImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({int id, String number, SeatType type, int busId});
+  $Res call({
+    int id,
+    String number,
+    SeatType type,
+    int busId,
+    String? busPlate,
+    int? busCapacity,
+  });
 }
 
 /// @nodoc
@@ -118,6 +144,8 @@ class __$$SeatModelImplCopyWithImpl<$Res>
     Object? number = null,
     Object? type = null,
     Object? busId = null,
+    Object? busPlate = freezed,
+    Object? busCapacity = freezed,
   }) {
     return _then(
       _$SeatModelImpl(
@@ -137,6 +165,14 @@ class __$$SeatModelImplCopyWithImpl<$Res>
             ? _value.busId
             : busId // ignore: cast_nullable_to_non_nullable
                   as int,
+        busPlate: freezed == busPlate
+            ? _value.busPlate
+            : busPlate // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        busCapacity: freezed == busCapacity
+            ? _value.busCapacity
+            : busCapacity // ignore: cast_nullable_to_non_nullable
+                  as int?,
       ),
     );
   }
@@ -150,6 +186,8 @@ class _$SeatModelImpl implements _SeatModel {
     required this.number,
     required this.type,
     required this.busId,
+    this.busPlate,
+    this.busCapacity,
   });
 
   factory _$SeatModelImpl.fromJson(Map<String, dynamic> json) =>
@@ -163,10 +201,14 @@ class _$SeatModelImpl implements _SeatModel {
   final SeatType type;
   @override
   final int busId;
+  @override
+  final String? busPlate;
+  @override
+  final int? busCapacity;
 
   @override
   String toString() {
-    return 'SeatModel(id: $id, number: $number, type: $type, busId: $busId)';
+    return 'SeatModel(id: $id, number: $number, type: $type, busId: $busId, busPlate: $busPlate, busCapacity: $busCapacity)';
   }
 
   @override
@@ -177,12 +219,17 @@ class _$SeatModelImpl implements _SeatModel {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.number, number) || other.number == number) &&
             (identical(other.type, type) || other.type == type) &&
-            (identical(other.busId, busId) || other.busId == busId));
+            (identical(other.busId, busId) || other.busId == busId) &&
+            (identical(other.busPlate, busPlate) ||
+                other.busPlate == busPlate) &&
+            (identical(other.busCapacity, busCapacity) ||
+                other.busCapacity == busCapacity));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, number, type, busId);
+  int get hashCode =>
+      Object.hash(runtimeType, id, number, type, busId, busPlate, busCapacity);
 
   /// Create a copy of SeatModel
   /// with the given fields replaced by the non-null parameter values.
@@ -204,6 +251,8 @@ abstract class _SeatModel implements SeatModel {
     required final String number,
     required final SeatType type,
     required final int busId,
+    final String? busPlate,
+    final int? busCapacity,
   }) = _$SeatModelImpl;
 
   factory _SeatModel.fromJson(Map<String, dynamic> json) =
@@ -217,6 +266,10 @@ abstract class _SeatModel implements SeatModel {
   SeatType get type;
   @override
   int get busId;
+  @override
+  String? get busPlate;
+  @override
+  int? get busCapacity;
 
   /// Create a copy of SeatModel
   /// with the given fields replaced by the non-null parameter values.

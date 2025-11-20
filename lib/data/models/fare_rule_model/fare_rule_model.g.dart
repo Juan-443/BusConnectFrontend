@@ -20,6 +20,8 @@ _$FareRuleModelImpl _$$FareRuleModelImplFromJson(Map<String, dynamic> json) =>
       routeId: (json['routeId'] as num).toInt(),
       fromStopId: (json['fromStopId'] as num).toInt(),
       toStopId: (json['toStopId'] as num).toInt(),
+      fromStopName: json['fromStopName'] as String?,
+      toStopName: json['toStopName'] as String?,
     );
 
 Map<String, dynamic> _$$FareRuleModelImplToJson(_$FareRuleModelImpl instance) =>
@@ -32,6 +34,8 @@ Map<String, dynamic> _$$FareRuleModelImplToJson(_$FareRuleModelImpl instance) =>
       'routeId': instance.routeId,
       'fromStopId': instance.fromStopId,
       'toStopId': instance.toStopId,
+      'fromStopName': instance.fromStopName,
+      'toStopName': instance.toStopName,
     };
 
 const _$DynamicPricingStatusEnumMap = {

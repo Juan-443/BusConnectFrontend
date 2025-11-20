@@ -7,16 +7,16 @@ import '../../../widgets/common/custom_button.dart';
 import '../../../providers/route_provider.dart';
 import '../../../providers/bus_provider.dart';
 
-class TripFormScreen extends ConsumerStatefulWidget {
+class TripFormScreenss extends ConsumerStatefulWidget {
   final bool isEdit;
 
-  const TripFormScreen({Key? key, this.isEdit = false}) : super(key: key);
+  const TripFormScreenss({Key? key, this.isEdit = false}) : super(key: key);
 
   @override
-  ConsumerState<TripFormScreen> createState() => _TripFormScreenState();
+  ConsumerState<TripFormScreenss> createState() => _TripFormScreenState();
 }
 
-class _TripFormScreenState extends ConsumerState<TripFormScreen> {
+class _TripFormScreenState extends ConsumerState<TripFormScreenss> {
   final _formKey = GlobalKey<FormState>();
 
   DateTime? _selectedDate;
